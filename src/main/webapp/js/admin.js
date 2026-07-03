@@ -114,7 +114,10 @@ function fetchProducts() {
                     <td>${product.stockQuantity}</td>
                     <td class="text-end text-primary fw-bold">LKR ${product.price.toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
                     <td class="text-center">
-                        <button class="btn btn-sm btn-outline-info" onclick='openEditProductModal(${JSON.stringify(product).replace(/'/g, "&#39;")})'><i class="bi bi-pencil"></i></button>
+                        <div class="btn-group">
+                            <button class="btn btn-sm btn-outline-info" onclick='openEditProductModal(${JSON.stringify(product).replace(/'/g, "&#39;")})'><i class="bi bi-pencil"></i></button>
+                            <button class="btn btn-sm btn-outline-danger" onclick="deleteProduct(${product.id})"><i class="bi bi-trash"></i></button>
+                        </div>
                     </td>
                 `;
                 tbody.appendChild(tr);
@@ -147,6 +150,26 @@ function openEditProductModal(product) {
     document.getElementById('productModalTitle').textContent = 'Edit Product';
     document.getElementById('productModalSubmitBtn').textContent = 'Update Product';
     new bootstrap.Modal(document.getElementById('productModal')).show();
+}
+
+function deleteProduct(id) {
+    if (confirm('Are you sure you want to delete this product? This action cannot be undone.')) {
+        fetch(`api/products/${id}`, {
+            method: 'DELETE'
+        })
+        .then(async response => {
+            if (!response.ok) {
+                const err = await response.text();
+                throw new Error(err || 'Failed to delete product');
+            }
+            alert('Product deleted successfully!');
+            fetchProducts();
+        })
+        .catch(error => {
+            console.error('Error deleting product:', error);
+            alert(error.message);
+        });
+    }
 }
 
 function handleAddProduct(event) {

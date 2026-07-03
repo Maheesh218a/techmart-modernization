@@ -63,4 +63,15 @@ public class ProductResource {
         productService.updateProduct(existingProduct);
         return Response.ok(existingProduct).build();
     }
+
+    @DELETE
+    @Path("/{id}")
+    public Response deleteProduct(@PathParam("id") Long id) {
+        Product existingProduct = productService.getProductById(id);
+        if (existingProduct == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+        productService.deleteProduct(id);
+        return Response.noContent().build();
+    }
 }

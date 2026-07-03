@@ -44,4 +44,11 @@ public class ProductService {
             productRepository.edit(product);
         }
     }
+    
+    public void deleteProduct(Long id) {
+        Product product = productRepository.find(id);
+        if (product != null) {
+            productRepository.remove(product);
+        }
+    }
 }
