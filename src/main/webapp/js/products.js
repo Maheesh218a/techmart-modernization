@@ -76,6 +76,9 @@ function displayProducts(products) {
             </div>`;
         }
 
+        // Escape quotes to prevent breaking the onclick attribute
+        const safeName = product.name.replace(/'/g, "&#39;").replace(/"/g, "&quot;");
+
         // Create a beautiful Bootstrap card for each product
         const card = document.createElement('div');
         card.className = 'col';
@@ -91,7 +94,7 @@ function displayProducts(products) {
                             <h4 class="mb-0 text-primary fw-bold">LKR ${product.price.toLocaleString(undefined, {minimumFractionDigits: 2})}</h4>
                             <small class="text-muted">Stock: ${product.stockQuantity}</small>
                         </div>
-                        <button class="btn btn-primary w-100 shadow-sm" onclick="addToCart(${product.id}, '${product.name}', ${product.price}, ${product.stockQuantity})">
+                        <button class="btn btn-primary w-100 shadow-sm" onclick="addToCart(${product.id}, '${safeName}', ${product.price}, ${product.stockQuantity})">
                             <i class="bi bi-cart-plus"></i> Add to Cart
                         </button>
                     </div>
