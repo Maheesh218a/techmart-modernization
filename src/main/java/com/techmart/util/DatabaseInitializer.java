@@ -33,13 +33,13 @@ public class DatabaseInitializer {
                 warehouse.setCapacity(5000);
                 em.persist(warehouse);
 
-                // Add sample products
-                addProduct("Dell XPS 13", "High-performance laptop with InfinityEdge display.", new BigDecimal("350000.00"), "Laptops", warehouse);
-                addProduct("MacBook Pro M2", "Apple's latest pro laptop with M2 chip.", new BigDecimal("480000.00"), "Laptops", warehouse);
-                addProduct("Logitech MX Master 3", "Advanced wireless mouse for productivity.", new BigDecimal("35000.00"), "Accessories", warehouse);
-                addProduct("Sony WH-1000XM5", "Industry-leading noise canceling headphones.", new BigDecimal("120000.00"), "Audio", warehouse);
-                addProduct("Samsung 34\" Curved Monitor", "Ultra-wide curved monitor for immersive viewing.", new BigDecimal("185000.00"), "Monitors", warehouse);
-                addProduct("Keychron K2 Keyboard", "Mechanical wireless keyboard.", new BigDecimal("42000.00"), "Accessories", warehouse);
+                // Add sample products with generated images
+                addProduct("Dell XPS 13", "High-performance laptop with InfinityEdge display.", new BigDecimal("350000.00"), "Laptops", "images/laptop1.png", warehouse);
+                addProduct("MacBook Pro M2", "Apple's latest pro laptop with M2 chip.", new BigDecimal("480000.00"), "Laptops", "images/laptop2.png", warehouse);
+                addProduct("Logitech MX Master 3", "Advanced wireless mouse for productivity.", new BigDecimal("35000.00"), "Accessories", "images/mouse1.png", warehouse);
+                addProduct("Sony WH-1000XM5", "Industry-leading noise canceling headphones.", new BigDecimal("120000.00"), "Audio", "images/audio1.png", warehouse);
+                addProduct("Samsung 34\" Curved Monitor", "Ultra-wide curved monitor for immersive viewing.", new BigDecimal("185000.00"), "Monitors", "images/monitor1.png", warehouse);
+                addProduct("Keychron K2 Keyboard", "Mechanical wireless keyboard.", new BigDecimal("42000.00"), "Accessories", "images/keyboard1.png", warehouse);
                 
                 System.out.println("Sample data initialization complete.");
             }
@@ -48,12 +48,13 @@ public class DatabaseInitializer {
         }
     }
 
-    private void addProduct(String name, String description, BigDecimal price, String category, Warehouse warehouse) {
+    private void addProduct(String name, String description, BigDecimal price, String category, String imageUrl, Warehouse warehouse) {
         Product p = new Product();
         p.setName(name);
         p.setDescription(description);
         p.setPrice(price);
         p.setCategory(category);
+        p.setImageUrl(imageUrl);
         p.setStockQuantity(50);
         p.setWarehouse(warehouse);
         em.persist(p);

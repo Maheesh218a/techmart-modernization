@@ -58,14 +58,23 @@ function displayProducts(products) {
     productList.innerHTML = ''; // Clear container
 
     products.forEach(product => {
+        // Render either the actual image or fallback to an icon
+        let imageHtml = '';
+        if (product.imageUrl) {
+            imageHtml = `<img src="${product.imageUrl}" class="card-img-top p-3" alt="${product.name}" style="height: 200px; object-fit: contain;">`;
+        } else {
+            imageHtml = `
+            <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px; font-size: 3rem; color: #adb5bd;">
+                <i class="bi ${getIconForCategory(product.category)}"></i>
+            </div>`;
+        }
+
         // Create a beautiful Bootstrap card for each product
         const card = document.createElement('div');
         card.className = 'col';
         card.innerHTML = `
             <div class="card h-100 shadow-sm product-card border-0">
-                <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 200px; font-size: 3rem; color: #adb5bd;">
-                    <i class="bi ${getIconForCategory(product.category)}"></i>
-                </div>
+                ${imageHtml}
                 <div class="card-body d-flex flex-column">
                     <span class="badge bg-secondary mb-2 align-self-start">${product.category}</span>
                     <h5 class="card-title fw-bold text-dark">${product.name}</h5>

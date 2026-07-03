@@ -22,6 +22,12 @@ public class Product implements Serializable {
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal price;
 
+    @Column(length = 255)
+    private String category;
+
+    @Column(length = 255)
+    private String imageUrl;
+
     @Column(name = "stock_quantity", nullable = false)
     private Integer stockQuantity = 0;
 
@@ -82,6 +88,9 @@ public class Product implements Serializable {
 
     public String getCategory() { return category; }
     public void setCategory(String category) { this.category = category; }
+
+    public String getImageUrl() { return imageUrl; }
+    public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
 
     public String getSku() { return sku; }
     public void setSku(String sku) { this.sku = sku; }
