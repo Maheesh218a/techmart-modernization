@@ -55,8 +55,12 @@ public class CustomerResource {
             }
             customerService.registerCustomer(customer);
             return Response.status(Response.Status.CREATED).entity(customer).build();
-        } catch (IllegalArgumentException e) {
-            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
+        } catch (Exception e) {
+            String msg = e.getMessage();
+            if (e.getCause() != null && e.getCause().getMessage() != null) {
+                msg = e.getCause().getMessage();
+            }
+            return Response.status(Response.Status.BAD_REQUEST).entity(msg).build();
         }
     }
 
@@ -70,9 +74,16 @@ public class CustomerResource {
     public Response login(LoginRequest request) {
         try {
             Customer customer = customerService.loginCustomer(request.email, request.password);
+            if (customer == null) {
+                return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid email or password").build();
+            }
             return Response.ok(customer).build();
-        } catch (IllegalArgumentException e) {
-            return Response.status(Response.Status.UNAUTHORIZED).entity(e.getMessage()).build();
+        } catch (Exception e) {
+            String msg = e.getMessage();
+            if (e.getCause() != null && e.getCause().getMessage() != null) {
+                msg = e.getCause().getMessage();
+            }
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(msg).build();
         }
     }
 }

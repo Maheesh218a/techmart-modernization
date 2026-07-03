@@ -24,11 +24,7 @@ public class CustomerService {
     }
 
     public Customer loginCustomer(String email, String password) {
-        Customer customer = customerRepository.findByEmailAndPassword(email, password);
-        if (customer == null) {
-            throw new IllegalArgumentException("Invalid email or password");
-        }
-        return customer;
+        return customerRepository.findByEmailAndPassword(email, password);
     }
 
     public Customer getCustomerById(Long id) {
