@@ -23,7 +23,7 @@ public class OrderRepository extends AbstractRepository<Order> {
     }
 
     public List<Order> findByCustomerId(Long customerId) {
-        return em.createQuery("SELECT o FROM Order o WHERE o.customer.id = :customerId ORDER BY o.orderDate DESC", Order.class)
+        return em.createQuery("SELECT DISTINCT o FROM Order o LEFT JOIN FETCH o.items i LEFT JOIN FETCH i.product WHERE o.customer.id = :customerId ORDER BY o.orderDate DESC", Order.class)
                  .setParameter("customerId", customerId)
                  .getResultList();
     }
@@ -32,5 +32,10 @@ public class OrderRepository extends AbstractRepository<Order> {
         return em.createQuery("SELECT o FROM Order o WHERE o.status = :status", Order.class)
                  .setParameter("status", status)
                  .getResultList();
+    }
+
+    @Override
+    public List<Order> findAll() {
+        return em.createQuery("SELECT DISTINCT o FROM Order o LEFT JOIN FETCH o.items i LEFT JOIN FETCH i.product ORDER BY o.orderDate DESC", Order.class).getResultList();
     }
 }

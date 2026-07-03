@@ -44,7 +44,7 @@ function switchTab(tab) {
 // ----------------------------------------------------
 function fetchOrders() {
     const tbody = document.getElementById('orders-tbody');
-    tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">Loading orders...</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">Loading orders...</td></tr>';
     
     fetch('api/orders')
         .then(response => {
@@ -53,7 +53,7 @@ function fetchOrders() {
         })
         .then(orders => {
             if (!orders || orders.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">No orders found.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">No orders found.</td></tr>';
                 return;
             }
             
@@ -63,12 +63,25 @@ function fetchOrders() {
                 if (order.status === 'DELIVERED') badgeClass = 'bg-success';
                 if (order.status === 'CANCELLED') badgeClass = 'bg-danger';
                 
+                // Format the items list
+                let itemsListHtml = '<ul class="list-unstyled mb-0 small">';
+                if (order.items && order.items.length > 0) {
+                    order.items.forEach(item => {
+                        const prodName = item.product ? item.product.name : 'Unknown Product';
+                        itemsListHtml += `<li>${item.quantity}x ${prodName}</li>`;
+                    });
+                } else {
+                    itemsListHtml += '<li><span class="text-muted">No items</span></li>';
+                }
+                itemsListHtml += '</ul>';
+                
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td class="fw-bold">#${order.id}</td>
                     <td>${new Date(order.orderDate).toLocaleString()}</td>
                     <td>${order.customer ? order.customer.name : 'Unknown'}<br><small class="text-muted">${order.customer ? order.customer.email : ''}</small></td>
                     <td>${order.shippingAddress}</td>
+                    <td>${itemsListHtml}</td>
                     <td><span class="badge ${badgeClass}">${order.status}</span></td>
                     <td class="text-end fw-bold">LKR ${order.totalAmount.toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
                 `;
@@ -77,7 +90,7 @@ function fetchOrders() {
         })
         .catch(error => {
             console.error('Error fetching orders:', error);
-            tbody.innerHTML = '<tr><td colspan="6" class="text-center text-danger">Error loading orders.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="7" class="text-center text-danger">Error loading orders.</td></tr>';
         });
 }
 
