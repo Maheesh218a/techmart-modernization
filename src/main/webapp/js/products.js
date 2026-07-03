@@ -77,7 +77,7 @@ function displayProducts(products) {
                 ${imageHtml}
                 <div class="card-body d-flex flex-column">
                     <span class="badge bg-secondary mb-2 align-self-start">${product.category}</span>
-                    <h5 class="card-title fw-bold text-dark">${product.name}</h5>
+                    <h5 class="card-title fw-bold">${product.name}</h5>
                     <p class="card-text text-muted small flex-grow-1">${product.description}</p>
                     <div class="mt-auto">
                         <div class="d-flex justify-content-between align-items-center mb-3">
