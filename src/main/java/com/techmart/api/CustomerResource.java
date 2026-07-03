@@ -32,9 +32,27 @@ public class CustomerResource {
         return Response.status(Response.Status.NOT_FOUND).build();
     }
 
+    public static class RegisterRequest {
+        public String name;
+        public String email;
+        public String phone;
+        public String address;
+        public String password;
+        public Boolean active;
+    }
+
     @POST
-    public Response createCustomer(Customer customer) {
+    public Response createCustomer(RegisterRequest request) {
         try {
+            Customer customer = new Customer();
+            customer.setName(request.name);
+            customer.setEmail(request.email);
+            customer.setPhone(request.phone);
+            customer.setAddress(request.address);
+            customer.setPassword(request.password);
+            if (request.active != null) {
+                customer.setActive(request.active);
+            }
             customerService.registerCustomer(customer);
             return Response.status(Response.Status.CREATED).entity(customer).build();
         } catch (IllegalArgumentException e) {
