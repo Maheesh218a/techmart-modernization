@@ -117,23 +117,17 @@ function getIconForCategory(category) {
 }
 
 function addToCart(id, name, price, stock) {
-    const user = JSON.parse(localStorage.getItem('techmart_user'));
-    if (!user) {
-        alert('Please login to add items to your cart.');
-        window.location.href = 'login.html?redirect=index.html';
-        return;
-    }
-
     if (stock <= 0) {
         alert('Sorry, this product is out of stock!');
         return;
     }
-    
-    // Check if product already in cart
+
+    // Check if already in cart
     const existingItem = cart.find(item => item.productId === id);
+    
     if (existingItem) {
         if (existingItem.quantity >= stock) {
-            alert('Cannot add more of this item. Stock limit reached.');
+            alert('Cannot add more. Stock limit reached!');
             return;
         }
         existingItem.quantity += 1;

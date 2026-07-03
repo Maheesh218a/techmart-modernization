@@ -9,6 +9,9 @@
         <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
         <jta-data-source>jdbc/techmart</jta-data-source>
 
+        <class>com.techmart.entity.Cart</class>
+        <class>com.techmart.entity.CartItem</class>
+
         <properties>
             <!-- Auto create tables -->
             <property name="jakarta.persistence.schema-generation.database.action" value="update"/>
