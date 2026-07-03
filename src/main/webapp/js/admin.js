@@ -114,7 +114,7 @@ function fetchProducts() {
                     <td>${product.stockQuantity}</td>
                     <td class="text-end text-primary fw-bold">LKR ${product.price.toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
                     <td class="text-center">
-                        <div class="btn-group">
+                        <div class="d-flex gap-2 justify-content-center">
                             <button class="btn btn-sm btn-outline-info" onclick='openEditProductModal(${JSON.stringify(product).replace(/'/g, "&#39;")})'><i class="bi bi-pencil"></i></button>
                             <button class="btn btn-sm btn-outline-danger" onclick="deleteProduct(${product.id})"><i class="bi bi-trash"></i></button>
                         </div>
