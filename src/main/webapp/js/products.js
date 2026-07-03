@@ -98,6 +98,13 @@ function getIconForCategory(category) {
 }
 
 function addToCart(id, name, price, stock) {
+    const user = JSON.parse(localStorage.getItem('techmart_user'));
+    if (!user) {
+        alert('Please login to add items to your cart.');
+        window.location.href = 'login.html?redirect=index.html';
+        return;
+    }
+
     if (stock <= 0) {
         alert('Sorry, this product is out of stock!');
         return;
