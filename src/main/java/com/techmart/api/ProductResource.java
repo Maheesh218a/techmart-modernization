@@ -43,4 +43,24 @@ public class ProductResource {
         productService.addProduct(product);
         return Response.status(Response.Status.CREATED).entity(product).build();
     }
+
+    @PUT
+    @Path("/{id}")
+    public Response updateProduct(@PathParam("id") Long id, Product updatedProduct) {
+        Product existingProduct = productService.getProductById(id);
+        if (existingProduct == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+        
+        // Update fields
+        existingProduct.setName(updatedProduct.getName());
+        existingProduct.setDescription(updatedProduct.getDescription());
+        existingProduct.setPrice(updatedProduct.getPrice());
+        existingProduct.setCategory(updatedProduct.getCategory());
+        existingProduct.setStockQuantity(updatedProduct.getStockQuantity());
+        existingProduct.setImageUrl(updatedProduct.getImageUrl());
+        
+        productService.updateProduct(existingProduct);
+        return Response.ok(existingProduct).build();
+    }
 }

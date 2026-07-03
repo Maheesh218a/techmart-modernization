@@ -113,18 +113,47 @@ function fetchProducts() {
                     <td><span class="badge bg-secondary">${product.category}</span></td>
                     <td>${product.stockQuantity}</td>
                     <td class="text-end text-primary fw-bold">LKR ${product.price.toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
+                    <td class="text-center">
+                        <button class="btn btn-sm btn-outline-info" onclick='openEditProductModal(${JSON.stringify(product).replace(/'/g, "&#39;")})'><i class="bi bi-pencil"></i></button>
+                    </td>
                 `;
                 tbody.appendChild(tr);
             });
         })
         .catch(error => {
             console.error('Error fetching products:', error);
-            tbody.innerHTML = '<tr><td colspan="6" class="text-center text-danger">Error loading products.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="7" class="text-center text-danger">Error loading products.</td></tr>';
         });
+}
+
+function openAddProductModal() {
+    document.getElementById('product-form').reset();
+    document.getElementById('prod-id').value = '';
+    document.getElementById('productModalTitle').textContent = 'Add New Product';
+    document.getElementById('productModalSubmitBtn').textContent = 'Save Product';
+    new bootstrap.Modal(document.getElementById('productModal')).show();
+}
+
+function openEditProductModal(product) {
+    document.getElementById('product-form').reset();
+    document.getElementById('prod-id').value = product.id;
+    document.getElementById('prod-name').value = product.name;
+    document.getElementById('prod-category').value = product.category;
+    document.getElementById('prod-desc').value = product.description;
+    document.getElementById('prod-price').value = product.price;
+    document.getElementById('prod-stock').value = product.stockQuantity;
+    document.getElementById('prod-image').value = product.imageUrl || '';
+    
+    document.getElementById('productModalTitle').textContent = 'Edit Product';
+    document.getElementById('productModalSubmitBtn').textContent = 'Update Product';
+    new bootstrap.Modal(document.getElementById('productModal')).show();
 }
 
 function handleAddProduct(event) {
     event.preventDefault();
+    
+    const productId = document.getElementById('prod-id').value;
+    const isEdit = productId !== '';
     
     const product = {
         name: document.getElementById('prod-name').value,
@@ -135,8 +164,11 @@ function handleAddProduct(event) {
         imageUrl: document.getElementById('prod-image').value || null
     };
     
-    fetch('api/products', {
-        method: 'POST',
+    const url = isEdit ? `api/products/${productId}` : 'api/products';
+    const method = isEdit ? 'PUT' : 'POST';
+    
+    fetch(url, {
+        method: method,
         headers: {
             'Content-Type': 'application/json'
         },
@@ -145,22 +177,19 @@ function handleAddProduct(event) {
     .then(async response => {
         if (!response.ok) {
             const err = await response.text();
-            throw new Error(err || 'Failed to add product');
+            throw new Error(err || 'Failed to save product');
         }
         return response.json();
     })
-    .then(newProduct => {
-        alert('Product added successfully!');
-        // Close modal
-        const modal = bootstrap.Modal.getInstance(document.getElementById('addProductModal'));
+    .then(savedProduct => {
+        alert(isEdit ? 'Product updated successfully!' : 'Product added successfully!');
+        const modal = bootstrap.Modal.getInstance(document.getElementById('productModal'));
         modal.hide();
-        // Reset form
-        document.getElementById('add-product-form').reset();
-        // Refresh table
+        document.getElementById('product-form').reset();
         fetchProducts();
     })
     .catch(error => {
-        console.error('Error adding product:', error);
+        console.error('Error saving product:', error);
         alert(error.message);
     });
 }
