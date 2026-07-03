@@ -1,0 +1,49 @@
+/* Custom Styles for TechMart */
+
+body {
+    font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background-color: #f8f9fa;
+}
+
+.hero-section {
+    background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+    border: 1px solid #90caf9;
+}
+
+.product-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
+}
+
+/* Custom Primary Color (Slightly darker blue than default Bootstrap) */
+.btn-primary {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+}
+
+.btn-primary:hover {
+    background-color: #0b5ed7;
+    border-color: #0a58ca;
+}
+
+/* Navbar adjustments */
+.navbar-brand {
+    letter-spacing: 1px;
+}
+
+.navbar .badge {
+    font-size: 0.65rem;
+}
+
+/* Cart table adjustments */
+#cart-items-body td {
+    vertical-align: middle;
+}
+
+input[type="text"].form-control-sm {
+    max-width: 50px;
+}

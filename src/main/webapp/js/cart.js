@@ -1,0 +1,158 @@
+let cart = JSON.parse(localStorage.getItem('techmart_cart')) || [];
+
+document.addEventListener('DOMContentLoaded', () => {
+    renderCart();
+    
+    document.getElementById('checkout-form').addEventListener('submit', handleCheckout);
+});
+
+function renderCart() {
+    const tbody = document.getElementById('cart-items-body');
+    const checkoutBtn = document.getElementById('btn-checkout');
+    
+    if (cart.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="5" class="text-center py-5">
+                    <i class="bi bi-cart-x text-muted" style="font-size: 3rem;"></i>
+                    <h5 class="mt-3 text-muted">Your cart is empty</h5>
+                    <a href="index.html" class="btn btn-outline-primary mt-2">Start Shopping</a>
+                </td>
+            </tr>
+        `;
+        updateTotals(0);
+        checkoutBtn.disabled = true;
+        return;
+    }
+
+    checkoutBtn.disabled = false;
+    tbody.innerHTML = '';
+    let subtotal = 0;
+
+    cart.forEach((item, index) => {
+        const itemTotal = item.unitPrice * item.quantity;
+        subtotal += itemTotal;
+        
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td class="ps-4 py-3">
+                <div class="d-flex align-items-center">
+                    <div class="bg-light rounded p-2 me-3 text-center" style="width: 50px; height: 50px;">
+                        <i class="bi bi-box text-secondary fs-4"></i>
+                    </div>
+                    <div>
+                        <h6 class="mb-0 fw-bold">${item.name}</h6>
+                        <small class="text-muted">Product ID: ${item.productId}</small>
+                    </div>
+                </div>
+            </td>
+            <td class="py-3 align-middle">LKR ${item.unitPrice.toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
+            <td class="py-3 align-middle">
+                <div class="d-flex align-items-center" style="width: 120px;">
+                    <button class="btn btn-sm btn-outline-secondary" onclick="updateQuantity(${index}, -1)">-</button>
+                    <input type="text" class="form-control form-control-sm text-center mx-2" value="${item.quantity}" readonly>
+                    <button class="btn btn-sm btn-outline-secondary" onclick="updateQuantity(${index}, 1)">+</button>
+                </div>
+            </td>
+            <td class="py-3 align-middle fw-bold text-dark">LKR ${itemTotal.toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
+            <td class="text-center pe-4 py-3 align-middle">
+                <button class="btn btn-sm btn-outline-danger" onclick="removeItem(${index})">
+                    <i class="bi bi-trash"></i>
+                </button>
+            </td>
+        `;
+        tbody.appendChild(tr);
+    });
+
+    updateTotals(subtotal);
+}
+
+function updateQuantity(index, change) {
+    const item = cart[index];
+    const newQty = item.quantity + change;
+    
+    if (newQty > 0) {
+        item.quantity = newQty;
+    } else {
+        // Remove if 0
+        cart.splice(index, 1);
+    }
+    
+    saveCart();
+    renderCart();
+}
+
+function removeItem(index) {
+    cart.splice(index, 1);
+    saveCart();
+    renderCart();
+}
+
+function saveCart() {
+    localStorage.setItem('techmart_cart', JSON.stringify(cart));
+}
+
+function updateTotals(subtotal) {
+    const formattedTotal = 'LKR ' + subtotal.toLocaleString(undefined, {minimumFractionDigits: 2});
+    document.getElementById('summary-subtotal').textContent = formattedTotal;
+    document.getElementById('summary-total').textContent = formattedTotal;
+}
+
+function handleCheckout(e) {
+    e.preventDefault();
+    
+    if (cart.length === 0) return;
+
+    const customerId = document.getElementById('customer-id').value;
+    const address = document.getElementById('shipping-address').value;
+    const notes = document.getElementById('order-notes').value;
+    
+    const btn = document.getElementById('btn-checkout');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Processing...';
+    btn.disabled = true;
+
+    // Prepare JSON payload matching OrderResource.OrderRequest structure
+    const payload = {
+        customerId: parseInt(customerId),
+        shippingAddress: address,
+        notes: notes,
+        items: cart.map(item => ({
+            product: { id: item.productId },
+            quantity: item.quantity,
+            unitPrice: item.unitPrice
+        }))
+    };
+
+    // Call REST API
+    fetch('api/orders', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+    })
+    .then(response => {
+        if (!response.ok) {
+            return response.text().then(err => { throw new Error(err || 'Failed to place order') });
+        }
+        return response.json();
+    })
+    .then(order => {
+        // Success
+        cart = [];
+        saveCart();
+        
+        document.getElementById('order-success-msg').innerHTML = 
+            `Your order <b>#${order.id}</b> was successfully placed!<br>A JMS background notification has been triggered.`;
+            
+        const modal = new bootstrap.Modal(document.getElementById('successModal'));
+        modal.show();
+    })
+    .catch(error => {
+        console.error('Checkout error:', error);
+        alert('Failed to place order: ' + error.message + '\nMake sure the Customer ID exists in the database.');
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+    });
+}
