@@ -1,5 +1,6 @@
 package com.techmart.util;
 
+import com.techmart.entity.Customer;
 import com.techmart.entity.Product;
 import com.techmart.entity.Warehouse;
 import jakarta.annotation.PostConstruct;
@@ -23,6 +24,23 @@ public class DatabaseInitializer {
             // Check if products already exist
             List<Product> existingProducts = em.createQuery("SELECT p FROM Product p", Product.class).getResultList();
             
+            // Check if admin exists
+            List<Customer> existingAdmins = em.createQuery("SELECT c FROM Customer c WHERE c.email = :email", Customer.class)
+                    .setParameter("email", "admin@techmart.com")
+                    .getResultList();
+            
+            if (existingAdmins.isEmpty()) {
+                System.out.println("No admin found in DB. Creating admin user...");
+                Customer admin = new Customer();
+                admin.setName("Admin User");
+                admin.setEmail("admin@techmart.com");
+                admin.setPassword("12345");
+                admin.setPhone("0000000000");
+                admin.setAddress("TechMart HQ");
+                admin.setActive(true);
+                em.persist(admin);
+            }
+
             if (existingProducts.isEmpty()) {
                 System.out.println("No products found in DB. Initializing with sample data...");
 

@@ -50,6 +50,11 @@ public class OrderResource {
     }
 
     @GET
+    public List<Order> getAllOrders() {
+        return orderService.getAllOrders();
+    }
+
+    @GET
     @Path("/{id}")
     public Response getOrder(@PathParam("id") Long id) {
         Order order = orderService.getOrderById(id);

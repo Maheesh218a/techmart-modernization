@@ -13,6 +13,15 @@ function checkAuth() {
         document.getElementById('login-menu').classList.add('d-none');
         document.getElementById('user-menu').classList.remove('d-none');
         document.getElementById('nav-username').textContent = user.name;
+        
+        const adminBtn = document.getElementById('nav-admin-btn');
+        if (adminBtn) {
+            if (user.email === 'admin@techmart.com') {
+                adminBtn.classList.remove('d-none');
+            } else {
+                adminBtn.classList.add('d-none');
+            }
+        }
     } else {
         document.getElementById('login-menu').classList.remove('d-none');
         document.getElementById('user-menu').classList.add('d-none');

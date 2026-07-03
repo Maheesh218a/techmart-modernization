@@ -68,6 +68,10 @@ public class OrderService {
         return orderRepository.findByCustomerId(customerId);
     }
     
+    public List<Order> getAllOrders() {
+        return orderRepository.findAll();
+    }
+    
     public void updateOrderStatus(Long orderId, Order.OrderStatus newStatus) {
         Order order = orderRepository.find(orderId);
         if (order != null) {
