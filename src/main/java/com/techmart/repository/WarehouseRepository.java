@@ -2,9 +2,9 @@ package com.techmart.repository;
 
 import com.techmart.entity.Warehouse;
 
-import javax.ejb.Stateless;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
+import jakarta.ejb.Stateless;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 
 @Stateless
 public class WarehouseRepository extends AbstractRepository<Warehouse> {

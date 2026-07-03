@@ -2,10 +2,10 @@ package com.techmart.repository;
 
 import com.techmart.entity.Customer;
 
-import javax.ejb.Stateless;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.persistence.NoResultException;
+import jakarta.ejb.Stateless;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.NoResultException;
 
 @Stateless
 public class CustomerRepository extends AbstractRepository<Customer> {

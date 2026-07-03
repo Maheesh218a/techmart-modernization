@@ -5,8 +5,8 @@ import com.techmart.entity.Order;
 import com.techmart.entity.OrderItem;
 import com.techmart.repository.OrderRepository;
 
-import javax.ejb.EJB;
-import javax.ejb.Stateless;
+import jakarta.ejb.EJB;
+import jakarta.ejb.Stateless;
 import java.math.BigDecimal;
 import java.util.List;
 

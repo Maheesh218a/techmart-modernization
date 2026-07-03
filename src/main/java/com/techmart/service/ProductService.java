@@ -3,8 +3,8 @@ package com.techmart.service;
 import com.techmart.entity.Product;
 import com.techmart.repository.ProductRepository;
 
-import javax.ejb.EJB;
-import javax.ejb.Stateless;
+import jakarta.ejb.EJB;
+import jakarta.ejb.Stateless;
 import java.util.List;
 
 @Stateless

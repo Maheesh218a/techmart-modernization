@@ -5,10 +5,10 @@ import com.techmart.entity.OrderItem;
 import com.techmart.messaging.NotificationProducer;
 import com.techmart.service.OrderService;
 
-import javax.ejb.EJB;
-import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import jakarta.ejb.EJB;
+import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import java.util.List;
 
 @Path("/orders")

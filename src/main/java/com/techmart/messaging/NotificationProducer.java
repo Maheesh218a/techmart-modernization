@@ -1,16 +1,16 @@
 package com.techmart.messaging;
 
-import javax.annotation.Resource;
-import javax.ejb.Stateless;
-import javax.inject.Inject;
-import javax.jms.JMSConnectionFactory;
-import javax.jms.JMSContext;
-import javax.jms.JMSDestinationDefinition;
-import javax.jms.Queue;
+import jakarta.annotation.Resource;
+import jakarta.ejb.Stateless;
+import jakarta.inject.Inject;
+import jakarta.jms.JMSConnectionFactory;
+import jakarta.jms.JMSContext;
+import jakarta.jms.JMSDestinationDefinition;
+import jakarta.jms.Queue;
 
 @JMSDestinationDefinition(
     name = "java:global/jms/TechMartNotificationQueue",
-    interfaceName = "javax.jms.Queue",
+    interfaceName = "jakarta.jms.Queue",
     destinationName = "TechMartNotificationQueue"
 )
 @Stateless

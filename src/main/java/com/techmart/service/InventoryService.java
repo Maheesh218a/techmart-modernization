@@ -6,10 +6,10 @@ import com.techmart.entity.Warehouse;
 import com.techmart.repository.AbstractRepository;
 import com.techmart.repository.ProductRepository;
 
-import javax.ejb.EJB;
-import javax.ejb.Stateless;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
+import jakarta.ejb.EJB;
+import jakarta.ejb.Stateless;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 
 @Stateless
 public class InventoryService {
