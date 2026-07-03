@@ -117,6 +117,22 @@ function removeItem(index) {
 
 function saveCart() {
     localStorage.setItem('techmart_cart', JSON.stringify(cart));
+    
+    // Sync to backend if logged in
+    const user = JSON.parse(localStorage.getItem('techmart_user'));
+    if (user) {
+        const payload = {
+            items: cart.map(item => ({
+                product: { id: item.productId },
+                quantity: item.quantity
+            }))
+        };
+        fetch(`api/cart/${user.id}/sync`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(payload)
+        }).catch(err => console.error("Failed to sync cart", err));
+    }
 }
 
 function updateTotals(subtotal) {

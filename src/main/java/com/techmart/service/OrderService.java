@@ -21,6 +21,9 @@ public class OrderService {
     
     @EJB
     private CustomerService customerService;
+    
+    @EJB
+    private CartService cartService;
 
     public Order createOrder(Long customerId, List<OrderItem> items, String shippingAddress, String notes) {
         Customer customer = customerService.getCustomerById(customerId);
@@ -56,6 +59,9 @@ public class OrderService {
         for (OrderItem item : items) {
             inventoryService.reduceStock(item.getProduct().getId(), item.getQuantity(), "Order Placed - ID: " + order.getId());
         }
+        
+        // Clear the user's cart in the DB
+        cartService.clearCart(customerId);
 
         return order;
     }

@@ -37,10 +37,58 @@ function handleLogin(e) {
         // Save user to localStorage
         localStorage.setItem('techmart_user', JSON.stringify(customer));
         
-        // Redirect back to original page or home
-        const urlParams = new URLSearchParams(window.location.search);
-        const redirect = urlParams.get('redirect') || 'index.html';
-        window.location.href = redirect;
+        // Merge carts
+        let localCart = JSON.parse(localStorage.getItem('techmart_cart')) || [];
+        
+        fetch(`api/cart/${customer.id}`)
+            .then(res => res.ok ? res.json() : { items: [] })
+            .then(dbCart => {
+                let mergedCartMap = new Map();
+                
+                // Add DB items
+                if (dbCart.items) {
+                    dbCart.items.forEach(i => {
+                        mergedCartMap.set(i.product.id, {
+                            productId: i.product.id,
+                            name: i.product.name,
+                            unitPrice: i.product.price, // API returns price inside product
+                            quantity: i.quantity
+                        });
+                    });
+                }
+                
+                // Add Local items (add quantities for same product)
+                localCart.forEach(i => {
+                    if (mergedCartMap.has(i.productId)) {
+                        mergedCartMap.get(i.productId).quantity += i.quantity;
+                    } else {
+                        mergedCartMap.set(i.productId, i);
+                    }
+                });
+                
+                const finalCart = Array.from(mergedCartMap.values());
+                localStorage.setItem('techmart_cart', JSON.stringify(finalCart));
+                
+                // Sync back to DB
+                const payload = {
+                    items: finalCart.map(item => ({
+                        product: { id: item.productId },
+                        quantity: item.quantity
+                    }))
+                };
+                
+                return fetch(`api/cart/${customer.id}/sync`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(payload)
+                });
+            })
+            .finally(() => {
+                // Redirect back to original page or home
+                const urlParams = new URLSearchParams(window.location.search);
+                const redirect = urlParams.get('redirect') || 'index.html';
+                window.location.href = redirect;
+            });
     })
     .catch(error => {
         errorDiv.textContent = error.message;
