@@ -15,6 +15,7 @@ public class OrderItem implements Serializable {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id", nullable = false)
+    @jakarta.json.bind.annotation.JsonbTransient
     private Order order;
 
     @ManyToOne(fetch = FetchType.LAZY)
