@@ -155,13 +155,36 @@ function handleAddProduct(event) {
     const productId = document.getElementById('prod-id').value;
     const isEdit = productId !== '';
     
+    const name = document.getElementById('prod-name').value.trim();
+    const category = document.getElementById('prod-category').value.trim();
+    const desc = document.getElementById('prod-desc').value.trim();
+    const price = parseFloat(document.getElementById('prod-price').value);
+    const stock = parseInt(document.getElementById('prod-stock').value);
+    const imageUrl = document.getElementById('prod-image').value.trim();
+
+    // Validations
+    if (!name || !category || !desc) {
+        alert("Name, Category, and Description cannot be empty.");
+        return;
+    }
+    
+    if (isNaN(price) || price < 0) {
+        alert("Price must be a valid positive number.");
+        return;
+    }
+    
+    if (isNaN(stock) || stock < 0) {
+        alert("Stock quantity must be a valid positive number.");
+        return;
+    }
+
     const product = {
-        name: document.getElementById('prod-name').value,
-        category: document.getElementById('prod-category').value,
-        description: document.getElementById('prod-desc').value,
-        price: parseFloat(document.getElementById('prod-price').value),
-        stockQuantity: parseInt(document.getElementById('prod-stock').value),
-        imageUrl: document.getElementById('prod-image').value || null
+        name: name,
+        category: category,
+        description: desc,
+        price: price,
+        stockQuantity: stock,
+        imageUrl: imageUrl || null
     };
     
     const url = isEdit ? `api/products/${productId}` : 'api/products';
