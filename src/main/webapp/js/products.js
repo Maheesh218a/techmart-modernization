@@ -2,9 +2,27 @@
 let cart = JSON.parse(localStorage.getItem('techmart_cart')) || [];
 
 document.addEventListener('DOMContentLoaded', () => {
+    checkAuth();
     updateCartBadge();
     fetchProducts();
 });
+
+function checkAuth() {
+    const user = JSON.parse(localStorage.getItem('techmart_user'));
+    if (user) {
+        document.getElementById('login-menu').classList.add('d-none');
+        document.getElementById('user-menu').classList.remove('d-none');
+        document.getElementById('nav-username').textContent = user.name;
+    } else {
+        document.getElementById('login-menu').classList.remove('d-none');
+        document.getElementById('user-menu').classList.add('d-none');
+    }
+}
+
+function logout() {
+    localStorage.removeItem('techmart_user');
+    checkAuth();
+}
 
 function fetchProducts() {
     // Call the REST API we built

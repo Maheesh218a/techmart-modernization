@@ -41,4 +41,20 @@ public class CustomerResource {
             return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
         }
     }
+
+    public static class LoginRequest {
+        public String email;
+        public String password;
+    }
+
+    @POST
+    @Path("/login")
+    public Response login(LoginRequest request) {
+        try {
+            Customer customer = customerService.loginCustomer(request.email, request.password);
+            return Response.ok(customer).build();
+        } catch (IllegalArgumentException e) {
+            return Response.status(Response.Status.UNAUTHORIZED).entity(e.getMessage()).build();
+        }
+    }
 }

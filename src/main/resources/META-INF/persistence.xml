@@ -11,7 +11,7 @@
 
         <properties>
             <!-- Auto create tables -->
-            <property name="jakarta.persistence.schema-generation.database.action" value="create"/>
+            <property name="jakarta.persistence.schema-generation.database.action" value="drop-and-create"/>
             
             <!-- EclipseLink specific properties for MySQL -->
             <property name="eclipselink.target-database" value="MySQL"/>

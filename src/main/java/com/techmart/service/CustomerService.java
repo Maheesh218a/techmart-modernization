@@ -17,7 +17,18 @@ public class CustomerService {
         if (customerRepository.findByEmail(customer.getEmail()) != null) {
             throw new IllegalArgumentException("Customer with this email already exists");
         }
+        if (customer.getPassword() == null || customer.getPassword().trim().isEmpty()) {
+            throw new IllegalArgumentException("Password is required");
+        }
         customerRepository.create(customer);
+    }
+
+    public Customer loginCustomer(String email, String password) {
+        Customer customer = customerRepository.findByEmailAndPassword(email, password);
+        if (customer == null) {
+            throw new IllegalArgumentException("Invalid email or password");
+        }
+        return customer;
     }
 
     public Customer getCustomerById(Long id) {

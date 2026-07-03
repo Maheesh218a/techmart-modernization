@@ -16,7 +16,14 @@
             <a class="navbar-brand fw-bold" href="index.html">
                 <i class="bi bi-cpu"></i> TechMart
             </a>
-            <div class="d-flex ms-auto">
+            <div class="d-flex align-items-center ms-auto">
+                <div id="user-menu" class="me-3 text-light d-none">
+                    <span class="small me-2">Hello, <b id="nav-username">User</b>!</span>
+                    <a href="#" class="btn btn-sm btn-outline-light" onclick="logout()">Logout</a>
+                </div>
+                <div id="login-menu" class="me-3">
+                    <a href="login.html" class="btn btn-sm btn-light">Login</a>
+                </div>
                 <a href="index.html" class="btn btn-outline-light">
                     <i class="bi bi-arrow-left"></i> Continue Shopping
                 </a>
@@ -75,11 +82,7 @@
 
                         <!-- Checkout Form -->
                         <form id="checkout-form">
-                            <div class="mb-3">
-                                <label class="form-label text-muted small">Customer ID</label>
-                                <input type="number" class="form-control" id="customer-id" placeholder="e.g. 1" required>
-                                <div class="form-text">For demo purposes, enter a registered Customer ID.</div>
-                            </div>
+                            <!-- Customer ID is now automatically derived from logged in user -->
                             <div class="mb-3">
                                 <label class="form-label text-muted small">Shipping Address</label>
                                 <textarea class="form-control" id="shipping-address" rows="2" required placeholder="Enter full address"></textarea>

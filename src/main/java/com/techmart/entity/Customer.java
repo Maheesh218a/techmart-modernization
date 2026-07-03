@@ -18,6 +18,10 @@ public class Customer implements Serializable {
     @Column(nullable = false, unique = true, length = 255)
     private String email;
 
+    @Column(nullable = false, length = 255)
+    @jakarta.json.bind.annotation.JsonbTransient
+    private String password;
+
     @Column(length = 20)
     private String phone;
 
@@ -70,6 +74,14 @@ public class Customer implements Serializable {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public String getPhone() {

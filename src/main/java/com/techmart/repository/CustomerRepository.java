@@ -31,4 +31,15 @@ public class CustomerRepository extends AbstractRepository<Customer> {
             return null;
         }
     }
+
+    public Customer findByEmailAndPassword(String email, String password) {
+        try {
+            return em.createQuery("SELECT c FROM Customer c WHERE c.email = :email AND c.password = :password", Customer.class)
+                     .setParameter("email", email)
+                     .setParameter("password", password)
+                     .getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        }
+    }
 }

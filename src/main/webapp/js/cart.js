@@ -1,10 +1,30 @@
 let cart = JSON.parse(localStorage.getItem('techmart_cart')) || [];
 
 document.addEventListener('DOMContentLoaded', () => {
+    checkAuth();
     renderCart();
     
     document.getElementById('checkout-form').addEventListener('submit', handleCheckout);
 });
+
+function checkAuth() {
+    const user = JSON.parse(localStorage.getItem('techmart_user'));
+    if (user) {
+        document.getElementById('login-menu').classList.add('d-none');
+        document.getElementById('user-menu').classList.remove('d-none');
+        document.getElementById('nav-username').textContent = user.name;
+    } else {
+        document.getElementById('login-menu').classList.remove('d-none');
+        document.getElementById('user-menu').classList.add('d-none');
+    }
+}
+
+function logout() {
+    localStorage.removeItem('techmart_user');
+    checkAuth();
+    // Redirect to login if on cart page
+    window.location.href = 'login.html?redirect=cart.html';
+}
 
 function renderCart() {
     const tbody = document.getElementById('cart-items-body');
@@ -49,14 +69,14 @@ function renderCart() {
             <td class="py-3 align-middle">LKR ${item.unitPrice.toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
             <td class="py-3 align-middle">
                 <div class="d-flex align-items-center" style="width: 120px;">
-                    <button class="btn btn-sm btn-outline-secondary" onclick="updateQuantity(${index}, -1)">-</button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="updateQuantity(${index}, -1)">-</button>
                     <input type="text" class="form-control form-control-sm text-center mx-2" value="${item.quantity}" readonly>
-                    <button class="btn btn-sm btn-outline-secondary" onclick="updateQuantity(${index}, 1)">+</button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="updateQuantity(${index}, 1)">+</button>
                 </div>
             </td>
             <td class="py-3 align-middle fw-bold text-dark">LKR ${itemTotal.toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
             <td class="text-center pe-4 py-3 align-middle">
-                <button class="btn btn-sm btn-outline-danger" onclick="removeItem(${index})">
+                <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeItem(${index})">
                     <i class="bi bi-trash"></i>
                 </button>
             </td>
@@ -103,7 +123,12 @@ function handleCheckout(e) {
     
     if (cart.length === 0) return;
 
-    const customerId = document.getElementById('customer-id').value;
+    const user = JSON.parse(localStorage.getItem('techmart_user'));
+    if (!user) {
+        window.location.href = 'login.html?redirect=cart.html';
+        return;
+    }
+
     const address = document.getElementById('shipping-address').value;
     const notes = document.getElementById('order-notes').value;
     
@@ -114,7 +139,7 @@ function handleCheckout(e) {
 
     // Prepare JSON payload matching OrderResource.OrderRequest structure
     const payload = {
-        customerId: parseInt(customerId),
+        customerId: user.id,
         shippingAddress: address,
         notes: notes,
         items: cart.map(item => ({
@@ -151,7 +176,7 @@ function handleCheckout(e) {
     })
     .catch(error => {
         console.error('Checkout error:', error);
-        alert('Failed to place order: ' + error.message + '\nMake sure the Customer ID exists in the database.');
+        alert('Failed to place order: ' + error.message);
         btn.innerHTML = originalText;
         btn.disabled = false;
     });
