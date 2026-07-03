@@ -38,8 +38,7 @@ public class Product implements Serializable {
     @Column(name = "warehouse_location", length = 255)
     private String warehouseLocation;
 
-    @Column(length = 100)
-    private String category;
+
 
     @Column(unique = true, length = 100)
     private String sku;
