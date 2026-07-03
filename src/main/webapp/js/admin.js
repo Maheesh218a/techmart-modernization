@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
     fetchProducts();
     
     // Add product form listener
-    document.getElementById('add-product-form').addEventListener('submit', handleAddProduct);
+    document.getElementById('product-form').addEventListener('submit', handleAddProduct);
 });
 
 function checkAdminAuth() {
