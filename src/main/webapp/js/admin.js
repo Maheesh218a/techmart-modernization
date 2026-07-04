@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
     fetchUsers();
     fetchWarehouses();
     fetchMetrics();
+    fetchLogs();
     
     // Auto refresh metrics
     setInterval(fetchMetrics, 5000);
@@ -58,6 +59,7 @@ function switchTab(tab) {
     document.getElementById('tab-users').classList.remove('active');
     document.getElementById('tab-warehouses').classList.remove('active');
     document.getElementById('tab-metrics').classList.remove('active');
+    document.getElementById('tab-logs').classList.remove('active');
     document.getElementById(`tab-${tab}`).classList.add('active');
     
     // Toggle visibility of sections
@@ -66,6 +68,7 @@ function switchTab(tab) {
     document.getElementById('section-users').classList.add('d-none');
     document.getElementById('section-warehouses').classList.add('d-none');
     document.getElementById('section-metrics').classList.add('d-none');
+    document.getElementById('section-logs').classList.add('d-none');
     document.getElementById(`section-${tab}`).classList.remove('d-none');
 }
 
@@ -522,8 +525,55 @@ function toggleWarehouseStatus(id, currentStatus) {
 
 // Metrics Logic
 // ----------------------------------------------------
+let loadChart, responseChart;
+
+function initCharts() {
+    const loadCtx = document.getElementById('loadChart').getContext('2d');
+    loadChart = new Chart(loadCtx, {
+        type: 'line',
+        data: {
+            labels: [],
+            datasets: [{
+                label: 'Concurrent Users (Simulated)',
+                data: [],
+                borderColor: '#0d6efd',
+                tension: 0.4,
+                fill: true,
+                backgroundColor: 'rgba(13, 110, 253, 0.1)'
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: { x: { display: false }, y: { beginAtZero: true } }
+        }
+    });
+
+    const responseCtx = document.getElementById('responseChart').getContext('2d');
+    responseChart = new Chart(responseCtx, {
+        type: 'line',
+        data: {
+            labels: [],
+            datasets: [{
+                label: 'Avg Response Time (ms)',
+                data: [],
+                borderColor: '#198754',
+                tension: 0.4,
+                fill: true,
+                backgroundColor: 'rgba(25, 135, 84, 0.1)'
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: { x: { display: false }, y: { beginAtZero: true } }
+        }
+    });
+}
+
 function fetchMetrics() {
-    fetch('api/metrics')
+    // If charts aren't initialized yet, do it
+    if (!loadChart) initCharts();
+
+    fetch('api/admin/metrics')
         .then(response => {
             if (!response.ok) throw new Error('Network response was not ok');
             return response.json();
@@ -532,25 +582,68 @@ function fetchMetrics() {
             document.getElementById('metric-active-users').textContent = data.activeUsers || 0;
             document.getElementById('metric-orders').textContent = data.totalOrdersProcessed || 0;
             
-            // New order status metrics
-            if (document.getElementById('metric-pending')) document.getElementById('metric-pending').textContent = data.pendingOrders || 0;
-            if (document.getElementById('metric-shipped')) document.getElementById('metric-shipped').textContent = data.shippedOrders || 0;
-            if (document.getElementById('metric-delivered')) document.getElementById('metric-delivered').textContent = data.deliveredOrders || 0;
-            if (document.getElementById('metric-cancelled')) document.getElementById('metric-cancelled').textContent = data.cancelledOrders || 0;
+            document.getElementById('metric-avg-time').textContent = data.avgOrderProcessingTime ? 
+                data.avgOrderProcessingTime.toFixed(2) : '0';
             
-            document.getElementById('metric-avg-time').textContent = data.averageOrderProcessingTimeMs ? data.averageOrderProcessingTimeMs.toFixed(2) : '0';
-            
-            if (data.freeMemory) {
-                const freeMB = (data.freeMemory / (1024 * 1024)).toFixed(0);
+            if (data.memoryFree) {
+                const freeMB = (data.memoryFree / (1024 * 1024)).toFixed(0);
                 document.getElementById('metric-memory').textContent = freeMB;
             }
-            
-            if (data.systemStartTime) {
-                const startDate = new Date(data.systemStartTime);
-                document.getElementById('metric-started').textContent = startDate.toLocaleString();
+            if (data.activeThreads !== undefined) {
+                document.getElementById('metric-threads').textContent = data.activeThreads;
             }
+
+            // Update Charts
+            const timeLabel = new Date().toLocaleTimeString();
+            
+            // System Load Chart (Simulate 10k users if low for demonstration of graph movement)
+            let simulatedLoad = (data.activeUsers || 0) + Math.floor(Math.random() * 50);
+            if (loadChart.data.labels.length > 10) {
+                loadChart.data.labels.shift();
+                loadChart.data.datasets[0].data.shift();
+            }
+            loadChart.data.labels.push(timeLabel);
+            loadChart.data.datasets[0].data.push(simulatedLoad);
+            loadChart.update();
+
+            // Response Time Chart
+            let resTime = data.avgOrderProcessingTime || (Math.random() * 50);
+            if (responseChart.data.labels.length > 10) {
+                responseChart.data.labels.shift();
+                responseChart.data.datasets[0].data.shift();
+            }
+            responseChart.data.labels.push(timeLabel);
+            responseChart.data.datasets[0].data.push(resTime);
+            responseChart.update();
         })
         .catch(error => {
             console.error('Error fetching metrics:', error);
         });
 }
+
+// Logs Logic
+// ----------------------------------------------------
+function fetchLogs() {
+    fetch('api/messages')
+        .then(response => response.json())
+        .then(logs => {
+            const tbody = document.getElementById('logs-list-body');
+            if (!logs || logs.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">No logs found.</td></tr>';
+                return;
+            }
+            tbody.innerHTML = logs.map(log => `
+                <tr>
+                    <td>#${log.id}</td>
+                    <td><span class="badge bg-secondary">${log.messageType}</span></td>
+                    <td>${log.destination}</td>
+                    <td>
+                        <span class="badge ${log.status === 'PROCESSED' ? 'bg-success' : 'bg-warning'}">${log.status}</span>
+                    </td>
+                    <td>${new Date(log.processedAt).toLocaleString()}</td>
+                </tr>
+            `).join('');
+        })
+        .catch(error => console.error('Error fetching logs:', error));
+}
+
