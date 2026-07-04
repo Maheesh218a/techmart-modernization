@@ -1,6 +1,8 @@
 package com.techmart.api;
 
 import com.techmart.service.PerformanceMetricsService;
+import com.techmart.repository.OrderRepository;
+import com.techmart.entity.Order;
 
 import jakarta.ejb.EJB;
 import jakarta.ws.rs.GET;
@@ -18,12 +20,21 @@ public class MetricsResource {
     @EJB
     private PerformanceMetricsService metricsService;
 
+    @EJB
+    private OrderRepository orderRepository;
+
     @GET
     public Response getMetrics() {
         Map<String, Object> metrics = new HashMap<>();
         metrics.put("systemStartTime", metricsService.getSystemStartTime().toString());
         metrics.put("activeUsers", metricsService.getActiveUsers());
-        metrics.put("totalOrdersProcessed", metricsService.getTotalOrdersProcessed());
+        
+        // Use DB counts for total and specific statuses
+        metrics.put("totalOrdersProcessed", orderRepository.countTotalOrders());
+        metrics.put("pendingOrders", orderRepository.countOrdersByStatus(Order.OrderStatus.PENDING));
+        metrics.put("shippedOrders", orderRepository.countOrdersByStatus(Order.OrderStatus.SHIPPED));
+        metrics.put("deliveredOrders", orderRepository.countOrdersByStatus(Order.OrderStatus.DELIVERED));
+        metrics.put("cancelledOrders", orderRepository.countOrdersByStatus(Order.OrderStatus.CANCELLED));
         metrics.put("averageOrderProcessingTimeMs", metricsService.getAverageOrderProcessingTimeMs());
         
         // Add memory stats

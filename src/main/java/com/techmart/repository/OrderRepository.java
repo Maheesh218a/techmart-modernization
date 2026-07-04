@@ -34,6 +34,17 @@ public class OrderRepository extends AbstractRepository<Order> {
                  .getResultList();
     }
 
+    public long countTotalOrders() {
+        return em.createQuery("SELECT COUNT(o) FROM Order o", Long.class)
+                .getSingleResult();
+    }
+
+    public long countOrdersByStatus(Order.OrderStatus status) {
+        return em.createQuery("SELECT COUNT(o) FROM Order o WHERE o.status = :status", Long.class)
+                .setParameter("status", status)
+                .getSingleResult();
+    }
+
     @Override
     public List<Order> findAll() {
         return em.createQuery("SELECT DISTINCT o FROM Order o LEFT JOIN FETCH o.items i LEFT JOIN FETCH i.product ORDER BY o.orderDate DESC", Order.class).getResultList();

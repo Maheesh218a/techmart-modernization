@@ -341,6 +341,13 @@ function fetchMetrics() {
         .then(data => {
             document.getElementById('metric-active-users').textContent = data.activeUsers || 0;
             document.getElementById('metric-orders').textContent = data.totalOrdersProcessed || 0;
+            
+            // New order status metrics
+            if (document.getElementById('metric-pending')) document.getElementById('metric-pending').textContent = data.pendingOrders || 0;
+            if (document.getElementById('metric-shipped')) document.getElementById('metric-shipped').textContent = data.shippedOrders || 0;
+            if (document.getElementById('metric-delivered')) document.getElementById('metric-delivered').textContent = data.deliveredOrders || 0;
+            if (document.getElementById('metric-cancelled')) document.getElementById('metric-cancelled').textContent = data.cancelledOrders || 0;
+            
             document.getElementById('metric-avg-time').textContent = data.averageOrderProcessingTimeMs ? data.averageOrderProcessingTimeMs.toFixed(2) : '0';
             
             if (data.freeMemory) {
