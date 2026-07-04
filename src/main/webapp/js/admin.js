@@ -683,17 +683,17 @@ function fetchInventoryLogs() {
                 tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">No inventory logs found.</td></tr>';
                 return;
             }
-            tbody.innerHTML = logs.map(log => \
+            tbody.innerHTML = logs.map(log => `
                 <tr>
-                    <td>#\</td>
-                    <td>\</td>
-                    <td>\</td>
-                    <td>\</td>
-                    <td><span class="badge \">\</span></td>
-                    <td>\\</td>
-                    <td>\</td>
+                    <td>#${log.id}</td>
+                    <td>${new Date(log.timestamp || log.createdAt).toLocaleString()}</td>
+                    <td>${log.product ? log.product.name : 'Unknown'}</td>
+                    <td>${log.warehouse ? log.warehouse.name : 'System'}</td>
+                    <td><span class="badge ${log.changeType === 'STOCK_IN' ? 'bg-success' : 'bg-danger'}">${log.changeType}</span></td>
+                    <td>${log.quantityChange > 0 ? '+' : ''}${log.quantityChange}</td>
+                    <td>${log.reason || '-'}</td>
                 </tr>
-            \).join('');
+            `).join('');
         })
         .catch(error => console.error('Error fetching inventory logs:', error));
 }
