@@ -27,8 +27,10 @@ function checkAuth() {
 }
 
 function logout() {
-    localStorage.removeItem('techmart_user');
-    checkAuth();
+    fetch('api/customers/logout', { method: 'POST' }).finally(() => {
+        localStorage.removeItem('techmart_user');
+        checkAuth();
+    });
 }
 
 function fetchProducts() {

@@ -2,6 +2,7 @@ package com.techmart.api;
 
 import com.techmart.entity.Customer;
 import com.techmart.service.CustomerService;
+import com.techmart.service.PerformanceMetricsService;
 
 import jakarta.ejb.EJB;
 import jakarta.ws.rs.*;
@@ -16,6 +17,9 @@ public class CustomerResource {
 
     @EJB
     private CustomerService customerService;
+
+    @EJB
+    private PerformanceMetricsService metricsService;
 
     @GET
     public List<Customer> getAllCustomers() {
@@ -77,6 +81,10 @@ public class CustomerResource {
             if (customer == null) {
                 return Response.status(Response.Status.UNAUTHORIZED).entity("Invalid email or password").build();
             }
+            
+            // Increment active users metric on successful login
+            metricsService.incrementActiveUsers();
+            
             return Response.ok(customer).build();
         } catch (Exception e) {
             String msg = e.getMessage();
@@ -84,6 +92,17 @@ public class CustomerResource {
                 msg = e.getCause().getMessage();
             }
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(msg).build();
+        }
+    }
+
+    @POST
+    @Path("/logout")
+    public Response logout() {
+        try {
+            metricsService.decrementActiveUsers();
+            return Response.ok().build();
+        } catch (Exception e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
         }
     }
 }

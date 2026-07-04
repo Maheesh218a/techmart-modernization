@@ -33,8 +33,10 @@ function checkAdminAuth() {
 }
 
 function logout() {
-    localStorage.removeItem('techmart_user');
-    window.location.href = 'index.html';
+    fetch('api/customers/logout', { method: 'POST' }).finally(() => {
+        localStorage.removeItem('techmart_user');
+        window.location.href = 'index.html';
+    });
 }
 
 // Tab Switching logic

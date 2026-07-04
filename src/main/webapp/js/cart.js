@@ -27,10 +27,12 @@ function checkAuth() {
 }
 
 function logout() {
-    localStorage.removeItem('techmart_user');
-    checkAuth();
-    // Redirect to login if on cart page
-    window.location.href = 'login.html?redirect=cart.html';
+    fetch('api/customers/logout', { method: 'POST' }).finally(() => {
+        localStorage.removeItem('techmart_user');
+        checkAuth();
+        // Redirect to login if on cart page
+        window.location.href = 'login.html?redirect=cart.html';
+    });
 }
 
 function renderCart() {
