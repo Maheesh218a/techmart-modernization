@@ -88,25 +88,29 @@ function fetchOrders() {
                     <td>${order.customer ? order.customer.name : 'Unknown'}<br><small class="text-muted">${order.customer ? order.customer.email : ''}</small></td>
                     <td>${order.shippingAddress}</td>
                     <td>${itemsListHtml}</td>
-                    <td><span class="badge ${badgeClass}">${order.status}</span></td>
-                    <td class="text-end fw-bold">LKR ${order.totalAmount.toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
-                    <td class="text-end">
+                    <td>
                         ${order.status === 'PENDING' ? `
-                            <button class="btn btn-sm btn-success me-1" onclick="updateOrderStatus(${order.id}, 'DELIVERED')" title="Mark as Delivered">
-                                <i class="fas fa-check"></i>
-                            </button>
-                            <button class="btn btn-sm btn-danger" onclick="updateOrderStatus(${order.id}, 'CANCELLED')" title="Cancel Order">
-                                <i class="fas fa-times"></i>
-                            </button>
-                        ` : ''}
+                            <div class="dropdown">
+                                <button class="btn btn-sm btn-warning dropdown-toggle fw-bold" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    PENDING
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item text-success fw-bold" href="#" onclick="updateOrderStatus(${order.id}, 'DELIVERED')"><i class="fas fa-check me-2"></i> Mark as Delivered</a></li>
+                                    <li><a class="dropdown-item text-danger fw-bold" href="#" onclick="updateOrderStatus(${order.id}, 'CANCELLED')"><i class="fas fa-times me-2"></i> Cancel Order</a></li>
+                                </ul>
+                            </div>
+                        ` : `
+                            <span class="badge ${badgeClass}">${order.status}</span>
+                        `}
                     </td>
+                    <td class="text-end fw-bold">LKR ${order.totalAmount.toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
                 `;
                 tbody.appendChild(tr);
             });
         })
         .catch(error => {
             console.error('Error fetching orders:', error);
-            tbody.innerHTML = '<tr><td colspan="8" class="text-center text-danger">Error loading orders.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="7" class="text-center text-danger">Error loading orders.</td></tr>';
         });
 }
 
@@ -158,6 +162,12 @@ function fetchProducts() {
                     <td class="fw-bold">${product.name}</td>
                     <td><span class="badge bg-secondary">${product.category}</span></td>
                     <td>${product.stockQuantity}</td>
+                    <td class="text-center">
+                        ${product.active !== false ? 
+                            `<button class="btn btn-sm btn-success" onclick="toggleProductStatus(${product.id}, false)">Active</button>` : 
+                            `<button class="btn btn-sm btn-danger" onclick="toggleProductStatus(${product.id}, true)">Inactive</button>`
+                        }
+                    </td>
                     <td class="text-end text-primary fw-bold">LKR ${product.price.toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
                     <td class="text-center">
                         <div class="d-flex gap-2 justify-content-center">
@@ -171,8 +181,24 @@ function fetchProducts() {
         })
         .catch(error => {
             console.error('Error fetching products:', error);
-            tbody.innerHTML = '<tr><td colspan="7" class="text-center text-danger">Error loading products.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="8" class="text-center text-danger">Error loading products.</td></tr>';
         });
+}
+
+function toggleProductStatus(id, active) {
+    if (!confirm(`Are you sure you want to mark this product as ${active ? 'Active' : 'Inactive'}?`)) return;
+
+    fetch(`api/products/${id}/status?active=${active}`, {
+        method: 'PUT'
+    })
+    .then(response => {
+        if (response.ok) {
+            fetchProducts();
+        } else {
+            alert('Failed to update product status.');
+        }
+    })
+    .catch(err => console.error('Error:', err));
 }
 
 function openAddProductModal() {

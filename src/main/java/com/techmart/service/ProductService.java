@@ -36,6 +36,14 @@ public class ProductService {
     public void updateProduct(Product product) {
         productRepository.edit(product);
     }
+
+    public void updateProductStatus(Long id, boolean active) {
+        Product product = productRepository.find(id);
+        if (product != null) {
+            product.setActive(active);
+            productRepository.edit(product);
+        }
+    }
     
     public void deactivateProduct(Long id) {
         Product product = productRepository.find(id);

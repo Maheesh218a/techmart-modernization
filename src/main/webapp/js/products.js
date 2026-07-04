@@ -33,7 +33,7 @@ function logout() {
 
 function fetchProducts() {
     // Call the REST API we built
-    fetch('api/products')
+    fetch('api/products/active')
         .then(response => {
             if (!response.ok) {
                 throw new Error('Network response was not ok');
