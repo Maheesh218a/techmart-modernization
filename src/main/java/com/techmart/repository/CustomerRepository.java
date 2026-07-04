@@ -42,4 +42,9 @@ public class CustomerRepository extends AbstractRepository<Customer> {
             return null;
         }
     }
+
+    public long countActiveCustomers() {
+        return em.createQuery("SELECT COUNT(c) FROM Customer c WHERE c.isActive = true", Long.class)
+                 .getSingleResult();
+    }
 }

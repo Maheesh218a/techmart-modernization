@@ -2,6 +2,7 @@ package com.techmart.api;
 
 import com.techmart.service.PerformanceMetricsService;
 import com.techmart.repository.OrderRepository;
+import com.techmart.repository.CustomerRepository;
 import com.techmart.entity.Order;
 
 import jakarta.ejb.EJB;
@@ -23,11 +24,16 @@ public class MetricsResource {
     @EJB
     private OrderRepository orderRepository;
 
+    @EJB
+    private CustomerRepository customerRepository;
+
     @GET
     public Response getMetrics() {
         Map<String, Object> metrics = new HashMap<>();
         metrics.put("systemStartTime", metricsService.getSystemStartTime().toString());
-        metrics.put("activeUsers", metricsService.getActiveUsers());
+        
+        // Active registered users in database
+        metrics.put("activeUsers", customerRepository.countActiveCustomers());
         
         // Use DB counts for total and specific statuses
         metrics.put("totalOrdersProcessed", orderRepository.countTotalOrders());
