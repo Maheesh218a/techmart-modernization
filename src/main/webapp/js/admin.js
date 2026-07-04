@@ -551,54 +551,7 @@ function toggleWarehouseStatus(id, currentStatus) {
 
 // Metrics Logic
 // ----------------------------------------------------
-let loadChart, responseChart;
-
-function initCharts() {
-    const loadCtx = document.getElementById('loadChart').getContext('2d');
-    loadChart = new Chart(loadCtx, {
-        type: 'line',
-        data: {
-            labels: [],
-            datasets: [{
-                label: 'Concurrent Users (Simulated)',
-                data: [],
-                borderColor: '#0d6efd',
-                tension: 0.4,
-                fill: true,
-                backgroundColor: 'rgba(13, 110, 253, 0.1)'
-            }]
-        },
-        options: {
-            responsive: true,
-            scales: { x: { display: false }, y: { beginAtZero: true } }
-        }
-    });
-
-    const responseCtx = document.getElementById('responseChart').getContext('2d');
-    responseChart = new Chart(responseCtx, {
-        type: 'line',
-        data: {
-            labels: [],
-            datasets: [{
-                label: 'Avg Response Time (ms)',
-                data: [],
-                borderColor: '#198754',
-                tension: 0.4,
-                fill: true,
-                backgroundColor: 'rgba(25, 135, 84, 0.1)'
-            }]
-        },
-        options: {
-            responsive: true,
-            scales: { x: { display: false }, y: { beginAtZero: true } }
-        }
-    });
-}
-
 function fetchMetrics() {
-    // If charts aren't initialized yet, do it
-    if (!loadChart) initCharts();
-
     fetch('api/admin/metrics')
         .then(response => {
             if (!response.ok) throw new Error('Network response was not ok');
@@ -618,29 +571,6 @@ function fetchMetrics() {
             if (data.activeThreads !== undefined) {
                 document.getElementById('metric-threads').textContent = data.activeThreads;
             }
-
-            // Update Charts
-            const timeLabel = new Date().toLocaleTimeString();
-            
-            // System Load Chart (Simulate 10k users if low for demonstration of graph movement)
-            let simulatedLoad = (data.activeUsers || 0) + Math.floor(Math.random() * 50);
-            if (loadChart.data.labels.length > 10) {
-                loadChart.data.labels.shift();
-                loadChart.data.datasets[0].data.shift();
-            }
-            loadChart.data.labels.push(timeLabel);
-            loadChart.data.datasets[0].data.push(simulatedLoad);
-            loadChart.update();
-
-            // Response Time Chart
-            let resTime = data.avgOrderProcessingTime || (Math.random() * 50);
-            if (responseChart.data.labels.length > 10) {
-                responseChart.data.labels.shift();
-                responseChart.data.datasets[0].data.shift();
-            }
-            responseChart.data.labels.push(timeLabel);
-            responseChart.data.datasets[0].data.push(resTime);
-            responseChart.update();
         })
         .catch(error => {
             console.error('Error fetching metrics:', error);
