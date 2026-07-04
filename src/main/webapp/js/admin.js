@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
     fetchOrders();
     fetchProducts();
     fetchUsers();
+    fetchWarehouses();
     fetchMetrics();
     
     // Auto refresh metrics
@@ -47,6 +48,7 @@ function switchTab(tab) {
     document.getElementById('tab-orders').classList.remove('active');
     document.getElementById('tab-products').classList.remove('active');
     document.getElementById('tab-users').classList.remove('active');
+    document.getElementById('tab-warehouses').classList.remove('active');
     document.getElementById('tab-metrics').classList.remove('active');
     document.getElementById(`tab-${tab}`).classList.add('active');
     
@@ -54,6 +56,7 @@ function switchTab(tab) {
     document.getElementById('section-orders').classList.add('d-none');
     document.getElementById('section-products').classList.add('d-none');
     document.getElementById('section-users').classList.add('d-none');
+    document.getElementById('section-warehouses').classList.add('d-none');
     document.getElementById('section-metrics').classList.add('d-none');
     document.getElementById(`section-${tab}`).classList.remove('d-none');
 }
@@ -389,6 +392,124 @@ function toggleUserStatus(userId, currentStatus) {
         console.error('Error updating status:', error);
         alert('An error occurred.');
     });
+}
+
+// Warehouses Logic
+// ----------------------------------------------------
+let warehousesData = [];
+
+function fetchWarehouses() {
+    fetch('api/warehouses')
+        .then(response => {
+            if (!response.ok) throw new Error('Network response was not ok');
+            return response.json();
+        })
+        .then(warehouses => {
+            warehousesData = warehouses;
+            const tbody = document.getElementById('warehouses-tbody');
+            
+            if (!warehouses || warehouses.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">No warehouses found.</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = warehouses.map(warehouse => `
+                <tr>
+                    <td>#${warehouse.id}</td>
+                    <td>${warehouse.name}</td>
+                    <td>${warehouse.location}</td>
+                    <td>${warehouse.capacity}</td>
+                    <td class="text-center">
+                        ${warehouse.active !== false ? 
+                            `<span class="badge bg-success">Active</span>` : 
+                            `<span class="badge bg-danger">Inactive</span>`
+                        }
+                    </td>
+                    <td class="text-end">
+                        <button class="btn btn-sm btn-outline-primary me-1" onclick="openWarehouseModal(${warehouse.id})">
+                            <i class="bi bi-pencil"></i> Edit
+                        </button>
+                        <button class="btn btn-sm ${warehouse.active !== false ? 'btn-outline-danger' : 'btn-outline-success'}" onclick="toggleWarehouseStatus(${warehouse.id}, ${warehouse.active !== false})">
+                            ${warehouse.active !== false ? '<i class="bi bi-power"></i> Disable' : '<i class="bi bi-check-circle"></i> Enable'}
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        })
+        .catch(error => {
+            console.error('Error fetching warehouses:', error);
+            document.getElementById('warehouses-tbody').innerHTML = '<tr><td colspan="6" class="text-center text-danger">Error loading warehouses.</td></tr>';
+        });
+}
+
+function openWarehouseModal(id = null) {
+    const modal = new bootstrap.Modal(document.getElementById('warehouseModal'));
+    document.getElementById('warehouse-form').reset();
+    document.getElementById('warehouse-id').value = '';
+    document.getElementById('warehouseModalTitle').textContent = 'Add New Warehouse';
+    
+    if (id) {
+        const warehouse = warehousesData.find(w => w.id === id);
+        if (warehouse) {
+            document.getElementById('warehouse-id').value = warehouse.id;
+            document.getElementById('warehouse-name').value = warehouse.name;
+            document.getElementById('warehouse-location').value = warehouse.location;
+            document.getElementById('warehouse-capacity').value = warehouse.capacity;
+            document.getElementById('warehouseModalTitle').textContent = 'Edit Warehouse';
+        }
+    }
+    
+    modal.show();
+}
+
+document.getElementById('warehouse-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const id = document.getElementById('warehouse-id').value;
+    const warehouseData = {
+        name: document.getElementById('warehouse-name').value,
+        location: document.getElementById('warehouse-location').value,
+        capacity: parseInt(document.getElementById('warehouse-capacity').value),
+        active: true
+    };
+    
+    const method = id ? 'PUT' : 'POST';
+    const url = id ? `api/warehouses/${id}` : 'api/warehouses';
+    
+    fetch(url, {
+        method: method,
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(warehouseData)
+    })
+    .then(response => {
+        if (response.ok) {
+            bootstrap.Modal.getInstance(document.getElementById('warehouseModal')).hide();
+            fetchWarehouses();
+        } else {
+            alert('Failed to save warehouse');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred while saving the warehouse.');
+    });
+});
+
+function toggleWarehouseStatus(id, currentStatus) {
+    const newStatus = !currentStatus;
+    fetch(`api/warehouses/${id}/status?active=${newStatus}`, {
+        method: 'PUT'
+    })
+    .then(response => {
+        if (response.ok) {
+            fetchWarehouses();
+        } else {
+            alert('Failed to update warehouse status');
+        }
+    })
+    .catch(error => console.error('Error:', error));
 }
 
 // Metrics Logic
