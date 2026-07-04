@@ -26,7 +26,7 @@ public class SessionResource {
             // In a real scenario, this would be a specific query in the repository
             List<SessionLog> activeSessions = sessionLogRepository.findAll()
                 .stream()
-                .filter(SessionLog::isActive)
+                .filter(s -> Boolean.TRUE.equals(s.getActive()))
                 .collect(Collectors.toList());
                 
             return Response.ok(activeSessions).build();
