@@ -96,4 +96,6 @@ curl -X GET http://localhost:8080/techmart-modernization/api/products
 ```
 
 ## 📄 License
-This project was created for educational purposes. Feel free to fork and use it!
+&copy; 2026 Maheesha. All Rights Reserved.
+
+This project was developed by Maheesha. Unauthorized copying, modification, or distribution of this software without explicit permission is strictly prohibited.
