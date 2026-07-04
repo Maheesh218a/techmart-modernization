@@ -33,18 +33,28 @@ public class OrderResource {
     @POST
     public Response createOrder(OrderRequest request) {
         try {
-            Order order = orderService.createOrder(
-                request.customerId, 
-                request.items, 
-                request.shippingAddress, 
-                request.notes
-            );
+            // Using JNDI lookup to get the Stateful session bean
+            // Since this is a REST endpoint, it's inherently stateless, so we look up a new
+            // instance of the CheckoutSessionBean for this specific request process.
+            javax.naming.InitialContext ic = new javax.naming.InitialContext();
+            com.techmart.service.CheckoutSessionBean checkoutBean = 
+                (com.techmart.service.CheckoutSessionBean) ic.lookup("java:module/CheckoutSessionBean");
             
-            // Send asynchronous notification
-            notificationProducer.sendNotification("Order placed successfully. Order ID: " + order.getId());
+            // Step 1: Initialize checkout with customer and items
+            checkoutBean.initializeCheckout(request.customerId, request.items);
+            
+            // Step 2: Set shipping details
+            checkoutBean.setShippingDetails(request.shippingAddress, request.notes);
+            
+            // Step 3: Complete checkout and create order (this also removes the Stateful bean)
+            Order order = checkoutBean.completeCheckout();
+            
+            // Send asynchronous notification (JMS)
+            notificationProducer.sendNotification("Order placed successfully via Stateful Checkout. Order ID: " + order.getId());
             
             return Response.status(Response.Status.CREATED).entity(order).build();
         } catch (Exception e) {
+            e.printStackTrace();
             return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
         }
     }

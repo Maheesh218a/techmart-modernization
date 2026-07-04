@@ -25,7 +25,15 @@ public class OrderService {
     @EJB
     private CartService cartService;
 
+    @EJB
+    private PerformanceMetricsService metricsService;
+
+    @EJB
+    private AsyncNotificationService asyncNotificationService;
+
     public Order createOrder(Long customerId, List<OrderItem> items, String shippingAddress, String notes) {
+        long startTime = System.currentTimeMillis();
+        
         Customer customer = customerService.getCustomerById(customerId);
         if (customer == null) {
             throw new IllegalArgumentException("Customer not found");
@@ -62,6 +70,16 @@ public class OrderService {
         
         // Clear the user's cart in the DB
         cartService.clearCart(customerId);
+
+        // Record metrics
+        long processingTime = System.currentTimeMillis() - startTime;
+        metricsService.recordOrderProcessing(processingTime);
+
+        // Send async notification (simulated email)
+        asyncNotificationService.sendEmailNotification(
+            customer.getEmail(), 
+            "Your order #" + order.getId() + " has been placed successfully."
+        );
 
         return order;
     }

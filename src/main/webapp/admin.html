@@ -36,6 +36,9 @@
                     <button class="list-group-item list-group-item-action" id="tab-products" onclick="switchTab('products')">
                         <i class="bi bi-box-seam me-2"></i> Manage Products
                     </button>
+                    <button class="list-group-item list-group-item-action" id="tab-metrics" onclick="switchTab('metrics')">
+                        <i class="bi bi-graph-up me-2"></i> System Metrics
+                    </button>
                 </div>
             </div>
 
@@ -98,6 +101,57 @@
                                     <tr><td colspan="7" class="text-center text-muted">Loading products...</td></tr>
                                 </tbody>
                             </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Metrics Section -->
+                <div id="section-metrics" class="d-none">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h4 class="mb-0 text-primary">System Performance Metrics</h4>
+                        <button class="btn btn-sm btn-outline-secondary" onclick="fetchMetrics()"><i class="bi bi-arrow-clockwise"></i> Refresh</button>
+                    </div>
+                    
+                    <div class="row g-4">
+                        <div class="col-md-6 col-lg-3">
+                            <div class="card bg-primary text-white h-100 shadow-sm border-0">
+                                <div class="card-body">
+                                    <h6 class="card-title text-white-50">Active Users</h6>
+                                    <h2 class="display-6 fw-bold mb-0" id="metric-active-users">0</h2>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-3">
+                            <div class="card bg-success text-white h-100 shadow-sm border-0">
+                                <div class="card-body">
+                                    <h6 class="card-title text-white-50">Orders Processed</h6>
+                                    <h2 class="display-6 fw-bold mb-0" id="metric-orders">0</h2>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-3">
+                            <div class="card bg-info text-white h-100 shadow-sm border-0">
+                                <div class="card-body">
+                                    <h6 class="card-title text-white-50">Avg Process Time</h6>
+                                    <h2 class="display-6 fw-bold mb-0"><span id="metric-avg-time">0</span> ms</h2>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-3">
+                            <div class="card bg-warning text-dark h-100 shadow-sm border-0">
+                                <div class="card-body">
+                                    <h6 class="card-title text-dark-50">Free Memory</h6>
+                                    <h2 class="display-6 fw-bold mb-0"><span id="metric-memory">0</span> MB</h2>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card shadow-sm border-0 mt-4">
+                        <div class="card-body">
+                            <h5 class="card-title text-muted">System Details</h5>
+                            <p class="mb-1"><strong>Server Started At:</strong> <span id="metric-started">N/A</span></p>
+                            <p class="mb-0 text-muted small">Metrics are collected in real-time by a Java EE @Singleton bean.</p>
                         </div>
                     </div>
                 </div>

@@ -4,6 +4,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initial fetches
     fetchOrders();
     fetchProducts();
+    fetchMetrics();
+    
+    // Auto refresh metrics
+    setInterval(fetchMetrics, 5000);
     
     // Add product form listener
     document.getElementById('product-form').addEventListener('submit', handleAddProduct);
@@ -33,15 +37,19 @@ function logout() {
     window.location.href = 'index.html';
 }
 
+// Tab Switching logic
+// ----------------------------------------------------
 function switchTab(tab) {
     // Update active class on buttons
     document.getElementById('tab-orders').classList.remove('active');
     document.getElementById('tab-products').classList.remove('active');
+    document.getElementById('tab-metrics').classList.remove('active');
     document.getElementById(`tab-${tab}`).classList.add('active');
     
     // Toggle visibility of sections
     document.getElementById('section-orders').classList.add('d-none');
     document.getElementById('section-products').classList.add('d-none');
+    document.getElementById('section-metrics').classList.add('d-none');
     document.getElementById(`section-${tab}`).classList.remove('d-none');
 }
 
@@ -320,4 +328,32 @@ function handleAddProduct(event) {
         console.error('Error saving product:', error);
         alert(error.message);
     });
+}
+
+// Metrics Logic
+// ----------------------------------------------------
+function fetchMetrics() {
+    fetch('api/metrics')
+        .then(response => {
+            if (!response.ok) throw new Error('Network response was not ok');
+            return response.json();
+        })
+        .then(data => {
+            document.getElementById('metric-active-users').textContent = data.activeUsers || 0;
+            document.getElementById('metric-orders').textContent = data.totalOrdersProcessed || 0;
+            document.getElementById('metric-avg-time').textContent = data.averageOrderProcessingTimeMs ? data.averageOrderProcessingTimeMs.toFixed(2) : '0';
+            
+            if (data.freeMemory) {
+                const freeMB = (data.freeMemory / (1024 * 1024)).toFixed(0);
+                document.getElementById('metric-memory').textContent = freeMB;
+            }
+            
+            if (data.systemStartTime) {
+                const startDate = new Date(data.systemStartTime);
+                document.getElementById('metric-started').textContent = startDate.toLocaleString();
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching metrics:', error);
+        });
 }
