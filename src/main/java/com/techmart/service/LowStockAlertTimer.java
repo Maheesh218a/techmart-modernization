@@ -31,10 +31,9 @@ public class LowStockAlertTimer {
             for (Product p : lowStockProducts) {
                 // Check if we already alerted recently? (Skipping complex logic for now, just generate alert)
                 Notification alert = new Notification();
-                alert.setCustomerId(0L); // System alert
-                alert.setTitle("Low Stock Alert: " + p.getName());
-                alert.setMessage("Product ID " + p.getId() + " (" + p.getName() + ") has low stock (" + p.getStockQuantity() + " remaining).");
-                alert.setType(Notification.NotificationType.SYSTEM_ALERT);
+                alert.setCustomer(null); // System alert
+                alert.setMessage("Low Stock Alert: Product ID " + p.getId() + " (" + p.getName() + ") has low stock (" + p.getStockQuantity() + " remaining).");
+                alert.setType(Notification.NotificationType.LOW_STOCK);
                 alert.setRead(false);
                 notificationRepository.create(alert);
             }
