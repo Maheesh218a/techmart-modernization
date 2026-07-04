@@ -17,7 +17,7 @@ public class InventoryLogRepository {
     }
 
     public List<InventoryLog> findAll() {
-        return em.createQuery("SELECT l FROM InventoryLog l ORDER BY l.timestamp DESC", InventoryLog.class)
+        return em.createQuery("SELECT l FROM InventoryLog l LEFT JOIN FETCH l.product LEFT JOIN FETCH l.warehouse ORDER BY l.createdAt DESC", InventoryLog.class)
                  .setMaxResults(100)
                  .getResultList();
     }
