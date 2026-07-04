@@ -2,6 +2,7 @@ package com.techmart.api;
 
 import com.techmart.entity.Cart;
 import com.techmart.service.CartService;
+import com.techmart.api.dto.CartSyncDto;
 
 import jakarta.ejb.EJB;
 import jakarta.ws.rs.*;
@@ -28,7 +29,7 @@ public class CartResource {
 
     @POST
     @Path("/{customerId}/sync")
-    public Response syncCart(@PathParam("customerId") Long customerId, Cart frontendCart) {
+    public Response syncCart(@PathParam("customerId") Long customerId, CartSyncDto frontendCart) {
         Cart cart = cartService.syncCart(customerId, frontendCart);
         if (cart != null) {
             return Response.ok(cart).build();
