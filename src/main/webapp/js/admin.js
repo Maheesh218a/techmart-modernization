@@ -90,14 +90,41 @@ function fetchOrders() {
                     <td>${itemsListHtml}</td>
                     <td><span class="badge ${badgeClass}">${order.status}</span></td>
                     <td class="text-end fw-bold">LKR ${order.totalAmount.toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
+                    <td class="text-end">
+                        ${order.status === 'PENDING' ? `
+                            <button class="btn btn-sm btn-success me-1" onclick="updateOrderStatus(${order.id}, 'DELIVERED')" title="Mark as Delivered">
+                                <i class="fas fa-check"></i>
+                            </button>
+                            <button class="btn btn-sm btn-danger" onclick="updateOrderStatus(${order.id}, 'CANCELLED')" title="Cancel Order">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        ` : ''}
+                    </td>
                 `;
                 tbody.appendChild(tr);
             });
         })
         .catch(error => {
             console.error('Error fetching orders:', error);
-            tbody.innerHTML = '<tr><td colspan="7" class="text-center text-danger">Error loading orders.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="8" class="text-center text-danger">Error loading orders.</td></tr>';
         });
+}
+
+function updateOrderStatus(orderId, newStatus) {
+    if (!confirm(`Are you sure you want to mark this order as ${newStatus}?`)) return;
+
+    fetch(`api/orders/${orderId}/status?status=${newStatus}`, {
+        method: 'PUT'
+    })
+    .then(response => {
+        if (response.ok) {
+            alert('Order status updated successfully.');
+            loadOrders(); // Refresh table
+        } else {
+            alert('Failed to update order status.');
+        }
+    })
+    .catch(err => console.error('Error updating order:', err));
 }
 
 // ----------------------------------------------------

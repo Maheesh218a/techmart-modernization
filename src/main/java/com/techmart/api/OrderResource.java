@@ -63,4 +63,16 @@ public class OrderResource {
         }
         return Response.status(Response.Status.NOT_FOUND).build();
     }
+
+    @PUT
+    @Path("/{id}/status")
+    public Response updateOrderStatus(@PathParam("id") Long id, @QueryParam("status") String status) {
+        try {
+            Order.OrderStatus newStatus = Order.OrderStatus.valueOf(status);
+            orderService.updateOrderStatus(id, newStatus);
+            return Response.ok().build();
+        } catch (IllegalArgumentException e) {
+            return Response.status(Response.Status.BAD_REQUEST).entity("Invalid status").build();
+        }
+    }
 }
