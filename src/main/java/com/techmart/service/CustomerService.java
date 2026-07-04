@@ -1,17 +1,42 @@
 package com.techmart.service;
 
 import com.techmart.entity.Customer;
+import com.techmart.entity.SessionLog;
 import com.techmart.repository.CustomerRepository;
+import com.techmart.repository.SessionLogRepository;
 
 import jakarta.ejb.EJB;
 import jakarta.ejb.Stateless;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @Stateless
 public class CustomerService {
 
     @EJB
     private CustomerRepository customerRepository;
+
+    @EJB
+    private SessionLogRepository sessionLogRepository;
+
+    public SessionLog createSession(Customer customer, String ipAddress) {
+        SessionLog sessionLog = new SessionLog();
+        sessionLog.setCustomer(customer);
+        sessionLog.setSessionId(UUID.randomUUID().toString());
+        sessionLog.setIpAddress(ipAddress);
+        sessionLogRepository.create(sessionLog);
+        return sessionLog;
+    }
+
+    public void endSession(String sessionId) {
+        SessionLog sessionLog = sessionLogRepository.findBySessionId(sessionId);
+        if (sessionLog != null) {
+            sessionLog.setLogoutTime(LocalDateTime.now());
+            sessionLog.setActive(false);
+            sessionLogRepository.edit(sessionLog);
+        }
+    }
 
     public void registerCustomer(Customer customer) {
         if (customerRepository.findByEmail(customer.getEmail()) != null) {

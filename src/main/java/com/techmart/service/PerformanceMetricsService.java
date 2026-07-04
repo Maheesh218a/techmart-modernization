@@ -1,6 +1,10 @@
 package com.techmart.service;
 
+import com.techmart.entity.PerformanceMetric;
+import com.techmart.repository.PerformanceMetricRepository;
+
 import jakarta.annotation.PostConstruct;
+import jakarta.ejb.EJB;
 import jakarta.ejb.Singleton;
 import jakarta.ejb.Startup;
 import java.time.LocalDateTime;
@@ -10,6 +14,9 @@ import java.util.concurrent.atomic.AtomicLong;
 @Singleton
 @Startup
 public class PerformanceMetricsService {
+
+    @EJB
+    private PerformanceMetricRepository performanceMetricRepository;
 
     private LocalDateTime systemStartTime;
     private AtomicInteger activeUsers;
@@ -35,6 +42,17 @@ public class PerformanceMetricsService {
     public void recordOrderProcessing(long processingTimeMs) {
         totalOrdersProcessed.incrementAndGet();
         totalProcessingTimeMs.addAndGet(processingTimeMs);
+        
+        try {
+            PerformanceMetric metric = new PerformanceMetric();
+            metric.setMetricName("Order Processing Time");
+            metric.setMetricValue((double) processingTimeMs);
+            metric.setUnit("ms");
+            metric.setComponent("OrderService");
+            performanceMetricRepository.create(metric);
+        } catch (Exception e) {
+            System.err.println("Failed to save performance metric: " + e.getMessage());
+        }
     }
 
     public LocalDateTime getSystemStartTime() {

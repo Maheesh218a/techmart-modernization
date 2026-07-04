@@ -33,14 +33,15 @@ function handleLogin(e) {
         }
         return response.json();
     })
-    .then(customer => {
+    .then(data => {
         // Save user to localStorage
-        localStorage.setItem('techmart_user', JSON.stringify(customer));
+        localStorage.setItem('techmart_user', JSON.stringify(data.customer));
+        localStorage.setItem('techmart_session', data.sessionId);
         
         // Merge carts
         let localCart = JSON.parse(localStorage.getItem('techmart_cart')) || [];
         
-        fetch(`api/cart/${customer.id}`)
+        fetch(`api/cart/${data.customer.id}`)
             .then(res => res.ok ? res.json() : { items: [] })
             .then(dbCart => {
                 let mergedCartMap = new Map();

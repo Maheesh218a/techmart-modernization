@@ -35,8 +35,16 @@ function checkAdminAuth() {
 }
 
 function logout() {
-    fetch('api/customers/logout', { method: 'POST' }).finally(() => {
+    const sessionId = localStorage.getItem('techmart_session');
+    fetch('api/customers/logout', { 
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ sessionId: sessionId })
+    }).finally(() => {
         localStorage.removeItem('techmart_user');
+        localStorage.removeItem('techmart_session');
         window.location.href = 'admin-login.html';
     });
 }

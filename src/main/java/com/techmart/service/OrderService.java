@@ -3,7 +3,9 @@ package com.techmart.service;
 import com.techmart.entity.Customer;
 import com.techmart.entity.Order;
 import com.techmart.entity.OrderItem;
+import com.techmart.entity.Notification;
 import com.techmart.repository.OrderRepository;
+import com.techmart.repository.NotificationRepository;
 
 import jakarta.ejb.EJB;
 import jakarta.ejb.Stateless;
@@ -30,6 +32,9 @@ public class OrderService {
 
     @EJB
     private AsyncNotificationService asyncNotificationService;
+    
+    @EJB
+    private NotificationRepository notificationRepository;
 
     public Order createOrder(Long customerId, List<OrderItem> items, String shippingAddress, String notes) {
         long startTime = System.currentTimeMillis();
@@ -74,6 +79,18 @@ public class OrderService {
         // Record metrics
         long processingTime = System.currentTimeMillis() - startTime;
         metricsService.recordOrderProcessing(processingTime);
+        
+        // Save notification to DB
+        try {
+            Notification notif = new Notification();
+            notif.setCustomer(customer);
+            notif.setOrder(order);
+            notif.setType(Notification.NotificationType.ORDER_CONFIRMED);
+            notif.setMessage("Your order #" + order.getId() + " has been placed successfully.");
+            notificationRepository.create(notif);
+        } catch (Exception e) {
+            System.err.println("Failed to save notification to DB: " + e.getMessage());
+        }
 
         // Send async notification (simulated email)
         asyncNotificationService.sendEmailNotification(
