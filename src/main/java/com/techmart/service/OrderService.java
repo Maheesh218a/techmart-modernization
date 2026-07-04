@@ -73,6 +73,15 @@ public class OrderService {
             inventoryService.reduceStock(item.getProduct().getId(), item.getQuantity(), "Order Placed - ID: " + order.getId());
         }
         
+        // Calculate and add Loyalty Points (1 point per $100)
+        int earnedPoints = total.divide(new BigDecimal(100), 0, java.math.RoundingMode.DOWN).intValue();
+        if (earnedPoints > 0) {
+            int currentPoints = customer.getLoyaltyPoints() != null ? customer.getLoyaltyPoints() : 0;
+            customer.setLoyaltyPoints(currentPoints + earnedPoints);
+            // customer is managed, so points will be updated, or we could call customerRepository.edit(customer)
+            // assuming it's managed since we fetched it via getCustomerById
+        }
+        
         // Clear the user's cart in the DB
         cartService.clearCart(customerId);
 

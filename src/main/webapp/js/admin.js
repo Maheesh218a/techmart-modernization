@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
     fetchWarehouses();
     fetchMetrics();
     fetchLogs();
+    fetchSessions();
     
     // Auto refresh metrics
     setInterval(fetchMetrics, 5000);
@@ -361,7 +362,7 @@ function fetchUsers() {
             const tbody = document.getElementById('users-tbody');
             
             if (!users || users.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">No users found.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">No users found.</td></tr>';
                 return;
             }
             
@@ -371,6 +372,7 @@ function fetchUsers() {
                     <td>${user.name}</td>
                     <td>${user.email}</td>
                     <td>${user.phone || '-'}</td>
+                    <td><span class="badge bg-primary rounded-pill"><i class="bi bi-star-fill me-1"></i>${user.loyaltyPoints || 0} pts</span></td>
                     <td class="text-center">
                         ${user.active !== false ? 
                             `<button class="btn btn-sm btn-success w-100" onclick="toggleUserStatus(${user.id}, true)">Active</button>` : 
@@ -384,6 +386,29 @@ function fetchUsers() {
             console.error('Error fetching users:', error);
             document.getElementById('users-tbody').innerHTML = '<tr><td colspan="5" class="text-center text-danger">Error loading users.</td></tr>';
         });
+}
+
+function fetchSessions() {
+    fetch('api/sessions/active')
+        .then(response => response.json())
+        .then(sessions => {
+            const tbody = document.getElementById('sessions-tbody');
+            if (!sessions || sessions.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">No active sessions found.</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = sessions.map(session => `
+                <tr>
+                    <td><span class="text-monospace small">${session.sessionId.substring(0, 8)}...</span></td>
+                    <td>#${session.customer ? session.customer.id : 'N/A'}</td>
+                    <td>${session.customer ? session.customer.name : 'Guest'}</td>
+                    <td><span class="badge bg-dark">${session.ipAddress || 'Unknown'}</span></td>
+                    <td>${new Date(session.loginTime).toLocaleString()}</td>
+                </tr>
+            `).join('');
+        })
+        .catch(error => console.error('Error fetching sessions:', error));
 }
 
 function toggleUserStatus(userId, currentStatus) {
