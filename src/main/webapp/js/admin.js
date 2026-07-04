@@ -122,8 +122,7 @@ function updateOrderStatus(orderId, newStatus) {
     })
     .then(response => {
         if (response.ok) {
-            alert('Order status updated successfully.');
-            loadOrders(); // Refresh table
+            fetchOrders(); // Refresh table
         } else {
             alert('Failed to update order status.');
         }
