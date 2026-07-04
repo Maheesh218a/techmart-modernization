@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initial fetches
     fetchOrders();
     fetchProducts();
+    fetchUsers();
     fetchMetrics();
     
     // Auto refresh metrics
@@ -45,12 +46,14 @@ function switchTab(tab) {
     // Update active class on buttons
     document.getElementById('tab-orders').classList.remove('active');
     document.getElementById('tab-products').classList.remove('active');
+    document.getElementById('tab-users').classList.remove('active');
     document.getElementById('tab-metrics').classList.remove('active');
     document.getElementById(`tab-${tab}`).classList.add('active');
     
     // Toggle visibility of sections
     document.getElementById('section-orders').classList.add('d-none');
     document.getElementById('section-products').classList.add('d-none');
+    document.getElementById('section-users').classList.add('d-none');
     document.getElementById('section-metrics').classList.add('d-none');
     document.getElementById(`section-${tab}`).classList.remove('d-none');
 }
@@ -329,6 +332,62 @@ function handleAddProduct(event) {
     .catch(error => {
         console.error('Error saving product:', error);
         alert(error.message);
+    });
+}
+
+// Users Logic
+// ----------------------------------------------------
+function fetchUsers() {
+    fetch('api/customers')
+        .then(response => {
+            if (!response.ok) throw new Error('Network response was not ok');
+            return response.json();
+        })
+        .then(users => {
+            const tbody = document.getElementById('users-tbody');
+            
+            if (!users || users.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">No users found.</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = users.map(user => `
+                <tr>
+                    <td>#${user.id}</td>
+                    <td>${user.name}</td>
+                    <td>${user.email}</td>
+                    <td>${user.phone || '-'}</td>
+                    <td class="text-center">
+                        ${user.active !== false ? 
+                            `<button class="btn btn-sm btn-success w-100" onclick="toggleUserStatus(${user.id}, true)">Active</button>` : 
+                            `<button class="btn btn-sm btn-danger w-100" onclick="toggleUserStatus(${user.id}, false)">Inactive</button>`
+                        }
+                    </td>
+                </tr>
+            `).join('');
+        })
+        .catch(error => {
+            console.error('Error fetching users:', error);
+            document.getElementById('users-tbody').innerHTML = '<tr><td colspan="5" class="text-center text-danger">Error loading users.</td></tr>';
+        });
+}
+
+function toggleUserStatus(userId, currentStatus) {
+    const newStatus = !currentStatus;
+    fetch(`api/customers/${userId}/status?active=${newStatus}`, {
+        method: 'PUT'
+    })
+    .then(response => {
+        if (response.ok) {
+            fetchUsers(); // Refresh table
+            fetchMetrics(); // Refresh metrics since count might change
+        } else {
+            alert('Failed to update user status.');
+        }
+    })
+    .catch(error => {
+        console.error('Error updating status:', error);
+        alert('An error occurred.');
     });
 }
 

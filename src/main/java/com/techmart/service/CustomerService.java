@@ -38,6 +38,16 @@ public class CustomerService {
     public List<Customer> getAllCustomers() {
         return customerRepository.findAll();
     }
+    
+    public void updateCustomerStatus(Long id, boolean isActive) {
+        Customer customer = customerRepository.find(id);
+        if (customer != null) {
+            customer.setActive(isActive);
+            customerRepository.edit(customer);
+        } else {
+            throw new IllegalArgumentException("Customer not found");
+        }
+    }
 
     public void updateCustomer(Customer customer) {
         customerRepository.edit(customer);

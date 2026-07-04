@@ -36,6 +36,19 @@ public class CustomerResource {
         return Response.status(Response.Status.NOT_FOUND).build();
     }
 
+    @PUT
+    @Path("/{id}/status")
+    public Response updateCustomerStatus(@PathParam("id") Long id, @QueryParam("active") boolean active) {
+        try {
+            customerService.updateCustomerStatus(id, active);
+            return Response.ok().entity("{\"status\":\"success\"}").build();
+        } catch (IllegalArgumentException e) {
+            return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
+        } catch (Exception e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
+        }
+    }
+
     public static class RegisterRequest {
         public String name;
         public String email;
