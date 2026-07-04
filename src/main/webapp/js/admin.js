@@ -561,6 +561,13 @@ function fetchMetrics() {
             document.getElementById('metric-active-users').textContent = data.activeUsers || 0;
             document.getElementById('metric-orders').textContent = data.totalOrdersProcessed || 0;
             
+            if (document.getElementById('metric-pending')) {
+                document.getElementById('metric-pending').textContent = data.pendingOrders || 0;
+                document.getElementById('metric-shipped').textContent = data.shippedOrders || 0;
+                document.getElementById('metric-delivered').textContent = data.deliveredOrders || 0;
+                document.getElementById('metric-cancelled').textContent = data.cancelledOrders || 0;
+            }
+            
             document.getElementById('metric-avg-time').textContent = data.avgOrderProcessingTime ? 
                 data.avgOrderProcessingTime.toFixed(2) : '0';
             

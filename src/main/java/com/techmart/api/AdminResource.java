@@ -1,5 +1,9 @@
 package com.techmart.api;
 
+import com.techmart.entity.Order;
+import com.techmart.entity.SessionLog;
+import com.techmart.repository.OrderRepository;
+import com.techmart.repository.SessionLogRepository;
 import com.techmart.service.PerformanceMetricsService;
 import jakarta.ejb.EJB;
 import jakarta.ws.rs.GET;
@@ -16,6 +20,12 @@ public class AdminResource {
 
     @EJB
     private PerformanceMetricsService metricsService;
+    
+    @EJB
+    private OrderRepository orderRepository;
+    
+    @EJB
+    private SessionLogRepository sessionLogRepository;
 
     @GET
     @Path("/metrics")
@@ -23,8 +33,14 @@ public class AdminResource {
         Map<String, Object> metrics = new HashMap<>();
         
         // Custom app metrics
-        metrics.put("activeUsers", metricsService.getActiveUsers());
-        metrics.put("totalOrdersProcessed", metricsService.getTotalOrdersProcessed());
+        long activeSessions = sessionLogRepository.findAll().stream().filter(s -> Boolean.TRUE.equals(s.getActive())).count();
+        metrics.put("activeUsers", activeSessions);
+        metrics.put("totalOrdersProcessed", orderRepository.countTotalOrders());
+        metrics.put("pendingOrders", orderRepository.countOrdersByStatus(Order.OrderStatus.PENDING));
+        metrics.put("shippedOrders", orderRepository.countOrdersByStatus(Order.OrderStatus.SHIPPED));
+        metrics.put("deliveredOrders", orderRepository.countOrdersByStatus(Order.OrderStatus.DELIVERED));
+        metrics.put("cancelledOrders", orderRepository.countOrdersByStatus(Order.OrderStatus.CANCELLED));
+        
         metrics.put("avgOrderProcessingTime", metricsService.getAverageOrderProcessingTimeMs());
         
         // JVM memory metrics
