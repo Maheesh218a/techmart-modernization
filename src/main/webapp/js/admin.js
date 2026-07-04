@@ -12,8 +12,14 @@ document.addEventListener('DOMContentLoaded', () => {
 function checkAdminAuth() {
     const user = JSON.parse(localStorage.getItem('techmart_user'));
     
+    if (!user) {
+        alert('Please login to access the admin dashboard.');
+        window.location.href = 'login.html';
+        return;
+    }
+    
     // Security check: Must be logged in AND email must be admin@techmart.com
-    if (!user || user.email !== 'admin@techmart.com') {
+    if (user.email !== 'admin@techmart.com') {
         alert('Access Denied: You do not have administrator privileges.');
         window.location.href = 'index.html';
         return;
