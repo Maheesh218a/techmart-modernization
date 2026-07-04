@@ -148,7 +148,7 @@ function addToCart(id, name, price, stock) {
     if (user) {
         const payload = {
             items: cart.map(item => ({
-                product: { id: item.productId },
+                productId: item.productId,
                 quantity: item.quantity
             }))
         };

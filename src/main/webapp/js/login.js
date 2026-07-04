@@ -72,7 +72,7 @@ function handleLogin(e) {
                 // Sync back to DB
                 const payload = {
                     items: finalCart.map(item => ({
-                        product: { id: item.productId },
+                        productId: item.productId,
                         quantity: item.quantity
                     }))
                 };

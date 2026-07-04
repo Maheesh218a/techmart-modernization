@@ -123,7 +123,7 @@ function saveCart() {
     if (user) {
         const payload = {
             items: cart.map(item => ({
-                product: { id: item.productId },
+                productId: item.productId,
                 quantity: item.quantity
             }))
         };
