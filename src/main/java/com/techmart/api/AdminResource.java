@@ -2,6 +2,7 @@ package com.techmart.api;
 
 import com.techmart.entity.Order;
 import com.techmart.entity.SessionLog;
+import com.techmart.repository.CustomerRepository;
 import com.techmart.repository.OrderRepository;
 import com.techmart.repository.SessionLogRepository;
 import com.techmart.service.PerformanceMetricsService;
@@ -27,14 +28,17 @@ public class AdminResource {
     @EJB
     private SessionLogRepository sessionLogRepository;
 
+    @EJB
+    private CustomerRepository customerRepository;
+
     @GET
     @Path("/metrics")
     public Response getSystemMetrics() {
         Map<String, Object> metrics = new HashMap<>();
         
         // Custom app metrics
-        long activeSessions = sessionLogRepository.findAll().stream().filter(s -> Boolean.TRUE.equals(s.getActive())).count();
-        metrics.put("activeUsers", activeSessions);
+        long activeCustomers = customerRepository.countActiveCustomers();
+        metrics.put("activeUsers", activeCustomers);
         metrics.put("totalOrdersProcessed", orderRepository.countTotalOrders());
         metrics.put("pendingOrders", orderRepository.countOrdersByStatus(Order.OrderStatus.PENDING));
         metrics.put("shippedOrders", orderRepository.countOrdersByStatus(Order.OrderStatus.SHIPPED));
