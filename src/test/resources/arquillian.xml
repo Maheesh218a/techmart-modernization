@@ -6,7 +6,7 @@
 
     <container qualifier="payara-micro" default="true">
         <configuration>
-            <property name="payaraMicroVersion">6.2023.4</property>
+            <property name="microJar">target/payara-micro.jar</property>
         </configuration>
     </container>
 

@@ -82,6 +82,7 @@ public class OrderServiceTest {
     public void testCreateOrder_Success() {
         // Arrange
         when(customerService.getCustomerById(1L)).thenReturn(testCustomer);
+        when(inventoryService.checkStock(eq(10L), eq(2))).thenReturn(true);
         doNothing().when(orderRepository).create(any(Order.class));
         doNothing().when(inventoryService).reduceStock(anyLong(), anyInt(), anyString());
         doNothing().when(cartService).clearCart(1L);
