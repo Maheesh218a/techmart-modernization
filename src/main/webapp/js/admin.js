@@ -14,7 +14,7 @@ function checkAdminAuth() {
     
     if (!user) {
         alert('Please login to access the admin dashboard.');
-        window.location.href = 'login.html';
+        window.location.href = 'login.html?redirect=admin.html';
         return;
     }
     
