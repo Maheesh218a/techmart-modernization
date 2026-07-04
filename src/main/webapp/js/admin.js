@@ -66,6 +66,7 @@ function fetchOrders() {
             tbody.innerHTML = '';
             orders.forEach(order => {
                 let badgeClass = 'bg-warning text-dark';
+                if (order.status === 'SHIPPED') badgeClass = 'bg-info text-dark';
                 if (order.status === 'DELIVERED') badgeClass = 'bg-success';
                 if (order.status === 'CANCELLED') badgeClass = 'bg-danger';
                 
@@ -93,6 +94,16 @@ function fetchOrders() {
                             <div class="dropdown">
                                 <button class="btn btn-sm btn-warning dropdown-toggle fw-bold" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                                     PENDING
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item text-info fw-bold" href="#" onclick="updateOrderStatus(${order.id}, 'SHIPPED')"><i class="fas fa-truck me-2"></i> Mark as Shipped</a></li>
+                                    <li><a class="dropdown-item text-danger fw-bold" href="#" onclick="updateOrderStatus(${order.id}, 'CANCELLED')"><i class="fas fa-times me-2"></i> Cancel Order</a></li>
+                                </ul>
+                            </div>
+                        ` : order.status === 'SHIPPED' ? `
+                            <div class="dropdown">
+                                <button class="btn btn-sm btn-info dropdown-toggle fw-bold" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    SHIPPED
                                 </button>
                                 <ul class="dropdown-menu">
                                     <li><a class="dropdown-item text-success fw-bold" href="#" onclick="updateOrderStatus(${order.id}, 'DELIVERED')"><i class="fas fa-check me-2"></i> Mark as Delivered</a></li>
