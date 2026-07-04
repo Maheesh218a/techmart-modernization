@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
     fetchMetrics();
     fetchLogs();
     fetchSessions();
+    fetchInventoryLogs();
     
     // Auto refresh metrics
     setInterval(fetchMetrics, 5000);
@@ -670,5 +671,30 @@ function fetchLogs() {
             `).join('');
         })
         .catch(error => console.error('Error fetching logs:', error));
+}
+
+
+function fetchInventoryLogs() {
+    fetch('api/inventory/logs')
+        .then(response => response.json())
+        .then(logs => {
+            const tbody = document.getElementById('inventory-logs-tbody');
+            if (!logs || logs.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">No inventory logs found.</td></tr>';
+                return;
+            }
+            tbody.innerHTML = logs.map(log => \
+                <tr>
+                    <td>#\</td>
+                    <td>\</td>
+                    <td>\</td>
+                    <td>\</td>
+                    <td><span class="badge \">\</span></td>
+                    <td>\\</td>
+                    <td>\</td>
+                </tr>
+            \).join('');
+        })
+        .catch(error => console.error('Error fetching inventory logs:', error));
 }
 
